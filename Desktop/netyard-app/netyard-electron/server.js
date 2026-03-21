@@ -269,24 +269,21 @@ app.post('/api/auth/verify-register', (req, res) => {
   res.json({ success: true, token, user: { id: user.userId, phone: user.phone, email: user.email } });
 });
 
-// Login with phone + password (no OTP needed if password matches)
+// Login: verify password first, then send OTP
 app.post('/api/auth/login', (req, res) => {
   const { phone, password } = req.body;
-  if (!phone) return res.status(400).json({ error: 'شماره موبایل الزامی است' });
+  if (!phone)    return res.status(400).json({ error: 'شماره موبایل الزامی است' });
+  if (!password) return res.status(400).json({ error: 'رمز عبور الزامی است' });
 
   const user = getByPhone(phone);
-  if (!user)         return res.status(404).json({ error: 'کاربری با این شماره پیدا نشد — ابتدا ثبت‌نام کنید' });
+  if (!user)          return res.status(404).json({ error: 'کاربری با این شماره پیدا نشد — ابتدا ثبت‌نام کنید' });
   if (!user.isActive) return res.status(403).json({ error: 'حساب شما غیرفعال شده است' });
 
-  // If password provided, verify it directly
-  if (password) {
-    if (!user.password || !bcrypt.compareSync(password, user.password))
-      return res.status(401).json({ error: 'رمز عبور اشتباه است' });
-    const token = makeJWT({ id: user.userId, phone: user.phone, email: user.email, isAdmin: false });
-    return res.json({ success: true, token, user: { id: user.userId, phone: user.phone, email: user.email } });
-  }
+  // Step 1: verify password
+  if (!user.password || !bcrypt.compareSync(password, user.password))
+    return res.status(401).json({ error: 'رمز عبور اشتباه است' });
 
-  // Fallback: OTP
+  // Step 2: send OTP
   const code = genOTP();
   otpSet(`login:${phone}`, code, 10 * 60 * 1000, null);
   console.log(`\n[LOGIN OTP] ${phone} → OTP: ${code}\n`);

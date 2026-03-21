@@ -231,15 +231,16 @@ input[dir="ltr"]{direction:ltr;text-align:left}
 
       <!-- LOGIN -->
       <div id="tab-login">
-        <div id="ls1" class="auth-step">
+        <div id="ls1">
           <div class="fg"><label>شماره موبایل</label><input type="tel" id="l-phone" placeholder="09xxxxxxxxx" maxlength="11" dir="ltr"></div>
+          <div class="fg"><label>رمز عبور</label><input type="password" id="l-pass" placeholder="رمز عبور خود را وارد کنید" dir="ltr"></div>
           <button class="btn bp" onclick="doLogin()">دریافت کد تایید</button>
         </div>
-        <div id="ls2" class="auth-step" style="display:none">
-          <p style="font-size:12px;color:var(--t2);margin-bottom:14px;text-align:center"><span style="color:var(--c3)">✅ صفحه کد تایید در تب جدید باز شد</span><br>کد را از آن صفحه کپی کنید و اینجا وارد کنید</p>
-          <div class="fg"><label>کد ۶ رقمی</label><input type="number" id="l-otp" placeholder="------" style="text-align:center;font-size:22px;letter-spacing:4px"></div>
+        <div id="ls2" style="display:none">
+          <p style="font-size:12px;color:var(--t2);margin-bottom:14px;text-align:center">کد تایید در <strong style="color:var(--c)">تب جدید</strong> باز شد<br>کد را کپی کن و اینجا وارد کن 👇</p>
+          <div class="fg"><label>کد ۶ رقمی</label><input type="number" id="l-otp" placeholder="------" style="text-align:center;font-size:26px;letter-spacing:6px;direction:ltr"></div>
           <button class="btn bp" onclick="doVerifyLogin()">ورود</button>
-          <button class="link-btn" onclick="document.getElementById('ls1').style.display='';document.getElementById('ls2').style.display='none'">← تغییر شماره</button>
+          <button class="lbtn" onclick="document.getElementById('ls1').style.display='';document.getElementById('ls2').style.display='none'">← تغییر شماره</button>
         </div>
       </div>
 
@@ -677,52 +678,46 @@ async function doVerifyRegister(){
 
 // ════════════ LOGIN ════════════
 async function doLogin(){
-  const phone=document.getElementById('l-phone').value.trim();
-  if(!phone){toast('شماره موبایل را وارد کنید','e');return;}
-  if(!/^09\d{9}$/.test(phone)){toast('شماره باید ۱۱ رقم و با ۰۹ شروع شود','e');return;}
+  const phone    = document.getElementById('l-phone').value.trim();
+  const password = document.getElementById('l-pass').value;
+  if(!phone)    { toast('شماره موبایل را وارد کنید','e'); return; }
+  if(!/^09\d{9}$/.test(phone)) { toast('شماره باید ۱۱ رقم و با ۰۹ شروع شود','e'); return; }
+  if(!password) { toast('رمز عبور را وارد کنید','e'); return; }
 
-  const btn=document.querySelector('#tab-login button.bp');
-  const origText=btn.textContent; btn.textContent='⏳ در حال ارسال...'; btn.disabled=true;
-  try{
-    const password = document.getElementById('l-pass').value;
-    if(!password){toast('رمز عبور را وارد کنید','e');return;}
-    const d=await api('POST','/api/auth/login',{phone,password});
-    if(d.success && d.token){
-      token=d.token; myUser=d.user; isAdmin=false;
-      localStorage.setItem('ny_tok',token);
-      localStorage.setItem('ny_usr',JSON.stringify(myUser));
-      localStorage.removeItem('ny_adm');
-      toast('خوش آمدید ✅','s');
-      initApp();
-      return;
-    }
-    if(d.error){toast(d.error,'e');return;}
-    window._loginPhone=phone;
+  const btn = document.querySelector('#tab-login button.bp');
+  const orig = btn.textContent; btn.textContent='⏳...'; btn.disabled=true;
+  try {
+    const d = await api('POST', '/api/auth/login', { phone, password });
+    if(d.error){ toast(d.error,'e'); return; }
+    // Password correct → open OTP page
+    window._loginPhone = phone;
     if(d.otpPageUrl){
-      const w=window.open(d.otpPageUrl,'_blank');
-      if(!w){toast('⚠️ Pop-up مسدود شد — در تب جدید باز کنید','e');}
+      const w = window.open(d.otpPageUrl, '_blank');
+      if(!w) toast('⚠️ Pop-up مسدود شد — کد در console است','e');
     }
-    document.getElementById('ls1').style.display='none';
-    document.getElementById('ls2').style.display='';
-    toast('✅ صفحه کد تایید باز شد','s');
-  }catch(e){toast('خطا در اتصال به سرور','e');console.error(e);}
-  finally{btn.textContent=origText;btn.disabled=false;}
+    document.getElementById('ls1').style.display = 'none';
+    document.getElementById('ls2').style.display = '';
+    document.getElementById('l-otp').value = '';
+    document.getElementById('l-otp').focus();
+    toast('✅ کد تایید باز شد','s');
+  } catch(e){ toast('خطا در اتصال به سرور','e'); console.error(e); }
+  finally { btn.textContent=orig; btn.disabled=false; }
 }
 
 async function doVerifyLogin(){
-  const phone=window._loginPhone||document.getElementById('l-phone').value.trim();
-  const otp=document.getElementById('l-otp').value.trim();
-  if(!otp){toast('کد تایید را وارد کنید','e');return;}
-  try{
-    const d=await api('POST','/api/auth/verify-login',{phone,otp});
-    if(d.error){toast(d.error,'e');return;}
+  const phone = window._loginPhone || document.getElementById('l-phone').value.trim();
+  const otp   = document.getElementById('l-otp').value.trim();
+  if(!otp){ toast('کد تایید را وارد کنید','e'); return; }
+  try {
+    const d = await api('POST', '/api/auth/verify-login', { phone, otp });
+    if(d.error){ toast(d.error,'e'); return; }
     token=d.token; myUser=d.user; isAdmin=false;
-    localStorage.setItem('ny_tok',token);
-    localStorage.setItem('ny_usr',JSON.stringify(myUser));
+    localStorage.setItem('ny_tok', token);
+    localStorage.setItem('ny_usr', JSON.stringify(myUser));
     localStorage.removeItem('ny_adm');
     toast('خوش آمدید ✅','s');
     initApp();
-  }catch(e){toast('خطا در اتصال به سرور','e');console.error(e);}
+  } catch(e){ toast('خطا در اتصال به سرور','e'); console.error(e); }
 }
 
 // ════════════ ADMIN LOGIN ════════════
