@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="نت‌یار">
+<title>نت‌یار</title>
+<link rel="manifest" href="/manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0e1a;--s1:#111827;--s2:#1a2233;--s3:#243044;
+  --b:#1e293b;--b2:#2d3f57;
+  --c:#00d4ff;--c2:#7c3aed;--c3:#10b981;--c4:#f59e0b;
+  --danger:#ef4444;--text:#e2e8f0;--t2:#94a3b8;--t3:#475569;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03)1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;animation:drift 12s ease-in-out infinite alternate}
+.o1{width:500px;height:500px;background:rgba(0,212,255,.07);top:-150px;right:-150px}
+.o2{width:350px;height:350px;background:rgba(124,58,237,.07);bottom:0;left:-80px;animation-delay:-4s}
+@keyframes drift{0%{transform:translate(0,0)}100%{transform:translate(30px,40px)}}
+
+/* Layout */
+#screens{flex:1;overflow:hidden;position:relative;z-index:1}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;overflow-y:auto;transition:opacity .3s,transform .3s}
+.screen.off{opacity:0;pointer-events:none;transform:translateY(16px)}
+.screen::-webkit-scrollbar{width:3px}
+.screen::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+/* Nav */
+#nav{position:relative;z-index:10;background:var(--s1);border-top:1px solid var(--b);display:none;flex-shrink:0}
+#nav.show{display:flex}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px calc(10px + env(safe-area-inset-bottom));background:none;border:none;cursor:pointer;color:var(--t3);font-family:'Vazirmatn',sans-serif;transition:color .2s}
+.nb.on{color:var(--c)}
+.nb .ni{font-size:20px;transition:transform .2s}
+.nb.on .ni{transform:scale(1.15)}
+.nb span{font-size:10px;font-weight:600}
+
+/* Cards & layout */
+.pad{padding:18px;padding-bottom:90px}
+.card{background:var(--s1);border:1px solid var(--b);border-radius:20px;overflow:hidden;margin-bottom:14px;position:relative}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c),var(--c2),transparent)}
+.cb{padding:20px}
+.ph{padding:18px 18px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.pt{font-size:22px;font-weight:900}
+.psub{font-size:12px;color:var(--t3);margin-top:2px}
+.stitle{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.ir{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b)}
+.ir:last-child{border-bottom:none}
+.ik{font-size:12px;color:var(--t3)}
+.iv{font-size:13px;font-weight:600;color:var(--text);text-align:left;direction:ltr;max-width:65%;word-break:break-all}
+.iv.hl{color:var(--c)}
+label{display:block;font-size:12px;color:var(--t2);margin-bottom:6px;font-weight:600}
+.fg{margin-bottom:14px}
+input,select{width:100%;padding:11px 14px;border-radius:12px;background:var(--s2);border:1px solid var(--b);color:var(--text);font-family:'Vazirmatn',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+input[type="number"]{-moz-appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+input:focus,select:focus{border-color:var(--c);box-shadow:0 0 0 3px rgba(0,212,255,.1)}
+input[dir="ltr"]{direction:ltr;text-align:left}
+.btn{display:block;width:100%;padding:13px;border-radius:13px;border:none;font-family:'Vazirmatn',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;text-decoration:none}
+.bp{background:linear-gradient(135deg,var(--c),var(--c2));color:#000}
+.bp:hover{opacity:.85;transform:translateY(-1px)}
+.bg2{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--c)}
+.bd{background:rgba(239,68,68,.1);border:1px solid var(--danger);color:var(--danger)}
+.bw{background:rgba(245,158,11,.1);border:1px solid var(--c4);color:var(--c4)}
+.btn+.btn{margin-top:10px}
+.link-btn{background:none;border:none;color:var(--c);cursor:pointer;font-family:'Vazirmatn',sans-serif;font-size:13px;font-weight:600;text-align:center;display:block;margin:10px auto 0;padding:4px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:50px;font-size:12px;font-weight:700}
+.bg{background:rgba(16,185,129,.12);border:1px solid var(--c3);color:var(--c3)}
+.br{background:rgba(239,68,68,.12);border:1px solid var(--danger);color:var(--danger)}
+.by{background:rgba(245,158,11,.12);border:1px solid var(--c4);color:var(--c4)}
+.bb{background:rgba(0,212,255,.12);border:1px solid var(--c);color:var(--c)}
+.pulse{width:8px;height:8px;border-radius:50%;background:currentColor;animation:pd 1.4s ease-in-out infinite}
+@keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+.ts{background:rgba(16,185,129,.95);color:#fff}
+.te{background:rgba(239,68,68,.95);color:#fff}
+.ti{background:rgba(0,212,255,.95);color:#000}
+.spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.25);border-top-color:currentColor;border-radius:50%;animation:sp .7s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+.divider{height:1px;background:var(--b);margin:14px 0;position:relative}
+.divider span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--s1);padding:0 10px;font-size:12px;color:var(--t3)}
+.avt{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--c),var(--c2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#000;cursor:pointer;border:none;flex-shrink:0}
+
+/* ── AUTH ── */
+#sc-auth{justify-content:center;align-items:center;padding:24px}
+.auth-wrap{width:100%;max-width:380px}
+.auth-card{background:var(--s1);border:1px solid var(--b);border-radius:22px;padding:28px 24px;position:relative;overflow:hidden;margin-bottom:12px}
+.auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--c),var(--c2))}
+.logo-area{text-align:center;margin-bottom:24px}
+.logo-ic{font-size:44px;display:block;margin-bottom:6px}
+.logo-nm{font-size:26px;font-weight:900;background:linear-gradient(135deg,var(--c),var(--c2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sb{font-size:11px;color:var(--t3);letter-spacing:1px;margin-top:2px}
+.auth-tab{display:flex;background:var(--s2);border-radius:12px;padding:4px;margin-bottom:20px;gap:4px}
+.at{flex:1;padding:9px;text-align:center;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;color:var(--t3);background:none;border:none;font-family:'Vazirmatn',sans-serif;transition:all .2s}
+.at.on{background:var(--s3);color:var(--c)}
+.auth-step{animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BIG BTN ── */
+.big-wrap{display:flex;justify-content:center;margin:4px 0 22px}
+.big{width:150px;height:150px;border-radius:50%;border:none;cursor:pointer;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:all .3s}
+.big::before{content:'';position:absolute;inset:-5px;border-radius:50%;border:2px solid transparent;transition:all .3s}
+.big.off{background:radial-gradient(circle,#1e2940,#111827)}
+.big.off::before{border-color:var(--b2)}
+.big.on{background:radial-gradient(circle,#0e4a5c,#0a3040);box-shadow:0 0 40px rgba(0,212,255,.4)}
+.big.on::before{border-color:var(--c)}
+.big.go{background:radial-gradient(circle,#3a2a00,#1e1800);animation:pb .8s ease-in-out infinite}
+@keyframes pb{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.big-ic{font-size:38px}
+.big-lb{font-size:11px;font-weight:700;letter-spacing:1px}
+.big.off .big-lb{color:var(--t3)}
+.big.on .big-lb{color:var(--c)}
+.big.go .big-lb{color:var(--c4)}
+.ring{position:absolute;border-radius:50%;border:1px solid;pointer-events:none;opacity:0}
+.big.on .ring{animation:ra 2s ease-out infinite}
+.r1{inset:-18px;border-color:rgba(0,212,255,.3);animation-delay:0s!important}
+.r2{inset:-32px;border-color:rgba(0,212,255,.15);animation-delay:.4s!important}
+.r3{inset:-46px;border-color:rgba(0,212,255,.07);animation-delay:.8s!important}
+@keyframes ra{0%{opacity:.7;transform:scale(.96)}100%{opacity:0;transform:scale(1.04)}}
+
+/* Net status bar */
+.nsb{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border:1px solid var(--b);border-radius:13px;padding:11px 15px;margin-bottom:14px}
+.ntp{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+.ip-box{background:var(--s2);border:1px solid var(--b);border-radius:13px;padding:14px;margin-bottom:12px}
+.ip-lbl{font-size:11px;color:var(--t3);margin-bottom:4px}
+.ip-val{font-size:20px;font-weight:900;color:var(--c);direction:ltr;letter-spacing:1px}
+
+/* Share */
+.sl-box{background:var(--s2);border:1px solid var(--b);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sl-txt{flex:1;font-size:12px;color:var(--c);direction:ltr;word-break:break-all}
+.cp-btn{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--c);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:11px;font-family:'Vazirmatn',sans-serif;font-weight:700;white-space:nowrap;flex-shrink:0}
+.del-btn{background:rgba(239,68,68,.1);border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:11px;font-family:'Vazirmatn',sans-serif;font-weight:700;white-space:nowrap;flex-shrink:0}
+.cu{display:flex;align-items:center;gap:10px;padding:10px;background:var(--s2);border-radius:11px;margin-bottom:8px}
+.ua{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--c),var(--c2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;color:#000}
+
+/* VPN */
+.vc{background:var(--s1);border:1px solid var(--b);border-radius:18px;overflow:hidden;margin-bottom:12px}
+.vh{padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.vl{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.vn{font-size:14px;font-weight:700}
+.vd{font-size:11px;color:var(--t3);margin-top:2px}
+.va{margin-right:auto;color:var(--t3);transition:transform .25s;font-size:18px}
+.vb{padding:0 18px;max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s}
+.vb.open{max-height:700px;padding-bottom:18px}
+.vs{display:flex;gap:11px;margin-bottom:13px;align-items:flex-start}
+.vsn{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--c),var(--c2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#000;flex-shrink:0;margin-top:2px}
+.vst{font-size:13px;color:var(--t2);line-height:1.6}
+.vst strong{color:var(--text)}
+.dl{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:50px;background:linear-gradient(135deg,var(--c),var(--c2));color:#000;font-weight:700;font-size:12px;text-decoration:none;margin-top:6px;border:none;font-family:'Vazirmatn',sans-serif;cursor:pointer}
+
+/* Admin */
+.user-row{background:var(--s2);border:1px solid var(--b);border-radius:13px;padding:14px;margin-bottom:10px}
+.user-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.user-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--c),var(--c2));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#000;flex-shrink:0}
+.user-phone{font-size:14px;font-weight:700;direction:ltr}
+.user-email{font-size:11px;color:var(--t3);direction:ltr;margin-top:2px}
+.user-actions{display:flex;gap:8px;margin-top:10px}
+.ua-btn{flex:1;padding:8px;border-radius:9px;border:none;font-family:'Vazirmatn',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center}
+.ua-del{background:rgba(239,68,68,.12);color:var(--danger);border:1px solid var(--danger)}
+.ua-tog{background:rgba(245,158,11,.12);color:var(--c4);border:1px solid var(--c4)}
+.ua-view{background:rgba(0,212,255,.12);color:var(--c);border:1px solid rgba(0,212,255,.4)}
+
+/* Download page */
+.dl-card{background:var(--s1);border:1px solid var(--b);border-radius:18px;padding:20px;margin-bottom:12px;display:flex;align-items:center;gap:16px}
+.dl-icon{font-size:40px;flex-shrink:0}
+.dl-info{flex:1}
+.dl-name{font-size:16px;font-weight:700;margin-bottom:4px}
+.dl-sub{font-size:12px;color:var(--t3)}
+.dl-btn-sm{background:linear-gradient(135deg,var(--c),var(--c2));color:#000;border:none;border-radius:10px;padding:10px 16px;font-family:'Vazirmatn',sans-serif;font-weight:700;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-bg.off{display:none}
+.modal{background:var(--s1);border:1px solid var(--b);border-radius:20px;padding:24px;width:100%;max-width:400px;position:relative;max-height:80vh;overflow-y:auto}
+.modal-close{position:absolute;top:16px;left:16px;background:none;border:none;color:var(--t3);font-size:22px;cursor:pointer;line-height:1}
+
+/* Settings rows */
+.sr{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--b);cursor:pointer}
+.sr:last-child{border-bottom:none}
+.si{display:flex;align-items:center;gap:11px}
+.sic{width:34px;height:34px;background:var(--s2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.slb{font-size:13px;font-weight:600}
+.ssb{font-size:11px;color:var(--t3);margin-top:2px}
+.tgl{width:42px;height:22px;background:var(--b2);border-radius:11px;position:relative;cursor:pointer;transition:background .25s;flex-shrink:0}
+.tgl.on{background:var(--c)}
+.tgl::after{content:'';position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .25s}
+.tgl.on::after{transform:translateX(-20px)}
+
+/* install banner */
+#ib{display:none;position:fixed;bottom:72px;left:12px;right:12px;background:var(--s1);border:1px solid var(--b);border-radius:15px;padding:13px 15px;z-index:50;gap:11px;align-items:center;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+#ib.show{display:flex}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div>
+<div class="toast" id="toast"></div>
+
+<!-- MODAL: User Detail -->
+<div class="modal-bg off" id="modal-user">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div style="font-size:16px;font-weight:700;margin-bottom:16px">جزئیات کاربر</div>
+    <div id="modal-user-content"></div>
+  </div>
+</div>
+
+<div id="screens">
+
+<!-- ═══ AUTH ═══ -->
+<div id="sc-auth" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="logo-area">
+        <span class="logo-ic">📡</span>
+        <div class="logo-nm">نت‌یار</div>
+        <div class="logo-sb">مدیریت هوشمند اینترنت</div>
+      </div>
+      <div class="auth-tab">
+        <button class="at on" onclick="switchAuthTab('login')">ورود</button>
+        <button class="at" onclick="switchAuthTab('register')">ثبت‌نام</button>
+        <button class="at" onclick="switchAuthTab('admin')">ادمین</button>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="tab-login">
+        <div id="ls1" class="auth-step">
+          <div class="fg"><label>شماره موبایل</label><input type="tel" id="l-phone" placeholder="09xxxxxxxxx" maxlength="11" dir="ltr"></div>
+          <button class="btn bp" onclick="doLogin()">دریافت کد تایید</button>
+        </div>
+        <div id="ls2" class="auth-step" style="display:none">
+          <p style="font-size:12px;color:var(--t2);margin-bottom:14px;text-align:center"><span style="color:var(--c3)">✅ صفحه کد تایید در تب جدید باز شد</span><br>کد را از آن صفحه کپی کنید و اینجا وارد کنید</p>
+          <div class="fg"><label>کد ۶ رقمی</label><input type="number" id="l-otp" placeholder="------" style="text-align:center;font-size:22px;letter-spacing:4px"></div>
+          <button class="btn bp" onclick="doVerifyLogin()">ورود</button>
+          <button class="link-btn" onclick="document.getElementById('ls1').style.display='';document.getElementById('ls2').style.display='none'">← تغییر شماره</button>
+        </div>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="tab-register" style="display:none">
+        <div id="rs1" class="auth-step">
+          <div class="fg"><label>شماره موبایل</label><input type="tel" id="r-phone" placeholder="09xxxxxxxxx" maxlength="11" dir="ltr"></div>
+          <div class="fg"><label>ایمیل</label><input type="email" id="r-email" placeholder="example@email.com" dir="ltr"></div>
+          <div class="fg"><label>کد ملی</label><input type="number" id="r-nid" placeholder="۱۰ رقم" maxlength="10" dir="ltr"></div>
+          <div class="fg"><label>شماره موبایل پدر</label><input type="tel" id="r-father" placeholder="09xxxxxxxxx" maxlength="11" dir="ltr"></div>
+          <div class="fg"><label>رمز عبور</label><input type="password" id="r-pass" placeholder="حداقل ۶ کاراکتر" dir="ltr"></div>
+          <div class="fg"><label>تکرار رمز عبور</label><input type="password" id="r-pass2" placeholder="رمز عبور را تکرار کنید" dir="ltr"></div>
+          <button class="btn bp" onclick="doRegister()">دریافت کد تایید</button>
+        </div>
+        <div id="rs2" class="auth-step" style="display:none">
+          <p style="font-size:12px;color:var(--t2);margin-bottom:14px;text-align:center">کد به ایمیل شما ارسال شد</p>
+          <div class="fg"><label>کد ۶ رقمی</label><input type="number" id="r-otp" placeholder="------" style="text-align:center;font-size:22px;letter-spacing:4px"></div>
+          <button class="btn bp" onclick="doVerifyRegister()">تکمیل ثبت‌نام</button>
+        </div>
+      </div>
+
+      <!-- ADMIN -->
+      <div id="tab-admin" style="display:none">
+        <div class="fg"><label>ایمیل ادمین</label><input type="email" id="a-email" placeholder="admin@example.com" dir="ltr"></div>
+        <div class="fg"><label>رمز عبور</label><input type="password" id="a-pass" placeholder="رمز عبور" dir="ltr"></div>
+        <button class="btn bp" onclick="doAdminLogin()">ورود به پنل ادمین</button>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <button class="link-btn" onclick="goDownload()">⬇️ دانلود اپلیکیشن</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MY INTERNET ═══ -->
+<div id="sc-mine" class="screen off">
+  <div class="ph">
+    <div><div class="pt">اینترنت من</div><div class="psub" id="hdr-phone">—</div></div>
+    <button class="avt" id="avt-btn" onclick="go('settings')">م</button>
+  </div>
+  <div class="pad">
+    <div class="big-wrap">
+      <button class="big off" id="big" onclick="toggleConn()">
+        <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+        <span class="big-ic" id="bic">⏻</span>
+        <span class="big-lb" id="blb">قطع</span>
+      </button>
+    </div>
+    <div class="nsb">
+      <div id="main-badge" class="badge by"><div class="pulse"></div><span id="main-status">بررسی...</span></div>
+      <div class="ntp"><span id="ct-icon">📶</span><span id="ct-text">نامشخص</span></div>
+    </div>
+    <div class="ip-box">
+      <div class="ip-lbl">آی‌پی عمومی شما</div>
+      <div class="ip-val" id="my-ip">در حال دریافت...</div>
+    </div>
+    <div class="card"><div class="cb">
+      <div class="ir"><span class="ik">کشور</span><span class="iv hl" id="i-country">—</span></div>
+      <div class="ir"><span class="ik">شهر</span><span class="iv" id="i-city">—</span></div>
+      <div class="ir"><span class="ik">اپراتور / ISP</span><span class="iv" id="i-isp">—</span></div>
+      <div class="ir"><span class="ik">نوع اتصال</span><span class="iv" id="i-type">—</span></div>
+      <div class="ir"><span class="ik">سرعت تخمینی</span><span class="iv hl" id="i-speed">—</span></div>
+    </div></div>
+    <button class="btn bg2" onclick="doRefresh()" id="rfbtn">🔄 بروزرسانی</button>
+  </div>
+</div>
+
+<!-- ═══ SHARE ═══ -->
+<div id="sc-share" class="screen off">
+  <div class="ph"><div><div class="pt">اشتراک‌گذاری</div><div class="psub">اینترنت را با دیگران شریک شو</div></div></div>
+  <div class="pad">
+    <div class="card"><div class="cb">
+      <div class="stitle">لینک دعوت من</div>
+      <div id="my-links"></div>
+      <button class="btn bp" onclick="createLink()">➕ لینک جدید</button>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="stitle">پیوستن با لینک دوست</div>
+      <div class="fg"><label>لینک یا کد</label><input type="text" id="join-inp" placeholder="لینک دوست خود را بچسبانید" dir="ltr"></div>
+      <button class="btn bg2" onclick="joinLink()">🔗 پیوستن</button>
+    </div></div>
+    <div class="card" id="ct-card" style="display:none"><div class="cb">
+      <div class="stitle">متصل به اینترنت دیگران</div>
+      <div id="ct-list"></div>
+    </div></div>
+    <div class="card" id="mc-card" style="display:none"><div class="cb">
+      <div class="stitle">کاربران متصل به اینترنت من</div>
+      <div id="mc-list"></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══ VPN ═══ -->
+<div id="sc-vpn" class="screen off">
+  <div class="ph"><div><div class="pt">VPN رایگان</div><div class="psub">راهنمای نصب و اتصال</div></div></div>
+  <div class="pad">
+    <div class="card" style="margin-bottom:14px"><div class="cb" style="padding:12px 16px;display:flex;gap:10px;align-items:center">
+      <span style="font-size:18px">💡</span>
+      <span style="font-size:12px;color:var(--t2);line-height:1.5">برای اتصال VPN واقعی، یکی از اپ‌های زیر را روی دستگاهت نصب کن. همه رایگان هستند.</span>
+    </div></div>
+
+    <!-- Outline -->
+    <div class="vc"><div class="vh" onclick="toggleV('outline')">
+      <div class="vl" style="background:rgba(0,212,255,.1)">🔷</div>
+      <div><div class="vn">Outline VPN</div><div class="vd">متن‌باز، ساخت Google Jigsaw</div></div>
+      <span class="va" id="va-outline">›</span>
+    </div>
+    <div class="vb" id="vb-outline">
+      <div class="vs"><div class="vsn">۱</div><div class="vst"><strong>دانلود Outline Client:</strong></div></div>
+      <a href="https://getoutline.org/get-started/#step-3" target="_blank" class="dl">⬇️ دانلود</a>
+      <div class="vs" style="margin-top:12px"><div class="vsn">۲</div><div class="vst"><strong>کلید رایگان:</strong> به <a href="https://www.reddit.com/r/outlinevpn/" target="_blank" style="color:var(--c)">r/outlinevpn</a> بروید و یک کلید ss:// رایگان دریافت کنید</div></div>
+      <div class="vs"><div class="vsn">۳</div><div class="vst">در اپ Outline روی <strong>+</strong> بزنید و کلید را وارد کنید</div></div>
+      <div class="vs"><div class="vsn">۴</div><div class="vst">سرور را انتخاب کنید → <strong>اتصال</strong></div></div>
+    </div></div>
+
+    <!-- Psiphon -->
+    <div class="vc"><div class="vh" onclick="toggleV('psiphon')">
+      <div class="vl" style="background:rgba(124,58,237,.1)">🟣</div>
+      <div><div class="vn">Psiphon</div><div class="vd">ساده‌ترین VPN — بدون کانفیگ</div></div>
+      <span class="va" id="va-psiphon">›</span>
+    </div>
+    <div class="vb" id="vb-psiphon">
+      <div class="vs"><div class="vsn">۱</div><div class="vst"><strong>دانلود:</strong></div></div>
+      <a href="https://psiphon.ca/fa/download.html" target="_blank" class="dl">⬇️ دانلود Psiphon</a>
+      <div class="vs" style="margin-top:12px"><div class="vsn">۲</div><div class="vst">نصب کنید و فقط <strong>دکمه اتصال</strong> را بزنید — همین!</div></div>
+      <div class="vs"><div class="vsn">۳</div><div class="vst">Psiphon به‌طور خودکار بهترین سرور را انتخاب می‌کند</div></div>
+    </div></div>
+
+    <!-- v2rayNG -->
+    <div class="vc"><div class="vh" onclick="toggleV('v2ray')">
+      <div class="vl" style="background:rgba(16,185,129,.1)">🟢</div>
+      <div><div class="vn">v2rayNG (اندروید)</div><div class="vd">حرفه‌ای‌ترین گزینه</div></div>
+      <span class="va" id="va-v2ray">›</span>
+    </div>
+    <div class="vb" id="vb-v2ray">
+      <div class="vs"><div class="vsn">۱</div><div class="vst"><strong>دانلود از GitHub:</strong></div></div>
+      <a href="https://github.com/2dust/v2rayNG/releases/latest" target="_blank" class="dl">⬇️ دانلود v2rayNG</a>
+      <div class="vs" style="margin-top:12px"><div class="vsn">۲</div><div class="vst"><strong>کانفیگ رایگان:</strong> در تلگرام <code style="background:var(--s3);padding:2px 5px;border-radius:4px;font-size:11px">@v2ray_configs</code> یا <code style="background:var(--s3);padding:2px 5px;border-radius:4px;font-size:11px">@freev2rays</code></div></div>
+      <div class="vs"><div class="vsn">۳</div><div class="vst">در اپ: <strong>+</strong> ← Import from clipboard</div></div>
+      <div class="vs"><div class="vsn">۴</div><div class="vst">سرور را انتخاب کنید و <strong>▶</strong> بزنید</div></div>
+    </div></div>
+
+    <!-- Warp -->
+    <div class="vc"><div class="vh" onclick="toggleV('warp')">
+      <div class="vl" style="background:rgba(245,158,11,.1)">🟡</div>
+      <div><div class="vn">Cloudflare WARP</div><div class="vd">1.1.1.1 — امن و سریع</div></div>
+      <span class="va" id="va-warp">›</span>
+    </div>
+    <div class="vb" id="vb-warp">
+      <div class="vs"><div class="vsn">۱</div><div class="vst"><strong>نصب اپ 1.1.1.1</strong> از اپ‌استور یا گوگل‌پلی:</div></div>
+      <a href="https://1.1.1.1/" target="_blank" class="dl">🌐 سایت رسمی</a>
+      <div class="vs" style="margin-top:12px"><div class="vsn">۲</div><div class="vst">حالت <strong>WARP</strong> را انتخاب کنید و دکمه اتصال را بزنید</div></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══ ADMIN ═══ -->
+<div id="sc-admin" class="screen off">
+  <div class="ph">
+    <div><div class="pt">پنل ادمین</div><div class="psub" id="adm-sub">مدیریت کاربران</div></div>
+    <button class="btn bd" style="width:auto;padding:8px 14px;font-size:12px" onclick="adminLogout()">خروج</button>
+  </div>
+  <div class="pad">
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+      <div class="card" style="margin:0"><div style="padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:var(--c)" id="stat-total">0</div>
+        <div style="font-size:11px;color:var(--t3)">کل کاربران</div>
+      </div></div>
+      <div class="card" style="margin:0"><div style="padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:var(--c3)" id="stat-active">0</div>
+        <div style="font-size:11px;color:var(--t3)">فعال</div>
+      </div></div>
+      <div class="card" style="margin:0"><div style="padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:900;color:var(--danger)" id="stat-inactive">0</div>
+        <div style="font-size:11px;color:var(--t3)">غیرفعال</div>
+      </div></div>
+    </div>
+
+    <div class="card"><div class="cb">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="stitle" style="margin:0">لیست کاربران</div>
+        <button class="btn bg2" style="width:auto;padding:7px 14px;font-size:12px" onclick="loadUsers()">🔄 بروزرسانی</button>
+      </div>
+      <div id="users-list"><div style="text-align:center;color:var(--t3);padding:20px;font-size:13px">در حال بارگذاری...</div></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div id="sc-settings" class="screen off">
+  <div class="ph"><div><div class="pt">تنظیمات</div></div></div>
+  <div class="pad">
+    <div class="card"><div class="cb">
+      <div class="stitle">حساب کاربری</div>
+      <div class="ir"><span class="ik">شماره موبایل</span><span class="iv hl" id="s-phone" dir="ltr">—</span></div>
+      <div class="ir"><span class="ik">ایمیل</span><span class="iv" id="s-email" dir="ltr">—</span></div>
+      <div class="ir"><span class="ik">تاریخ عضویت</span><span class="iv" id="s-joined">—</span></div>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="stitle">برنامه</div>
+      <div class="sr" onclick="doInstall()">
+        <div class="si"><div class="sic">📲</div><div><div class="slb">نصب روی گوشی</div><div class="ssb">افزودن به صفحه اصلی</div></div></div>
+        <span style="color:var(--t3)">›</span>
+      </div>
+      <div class="sr" onclick="goDownload()">
+        <div class="si"><div class="sic">💻</div><div><div class="slb">دانلود نسخه دسکتاپ</div><div class="ssb">ویندوز، مک، لینوکس</div></div></div>
+        <span style="color:var(--t3)">›</span>
+      </div>
+      <div class="sr">
+        <div class="si"><div class="sic">🔔</div><div><div class="slb">اعلان‌ها</div></div></div>
+        <div class="tgl on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="sr">
+        <div class="si"><div class="sic">🌐</div><div><div class="slb">بروزرسانی خودکار</div><div class="ssb">هر ۳۰ ثانیه</div></div></div>
+        <div class="tgl on" id="auto-rf" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="sr" onclick="doLogout()">
+        <div class="si"><div class="sic">🚪</div><div><div class="slb" style="color:var(--danger)">خروج از حساب</div></div></div>
+        <span style="color:var(--danger)">›</span>
+      </div>
+    </div></div>
+    <div style="text-align:center;padding:16px;color:var(--t3);font-size:12px">نت‌یار v1.0</div>
+  </div>
+</div>
+
+<!-- ═══ DOWNLOAD ═══ -->
+<div id="sc-download" class="screen off">
+  <div class="ph">
+    <div><div class="pt">دانلود اپلیکیشن</div><div class="psub">نسخه دسکتاپ نت‌یار</div></div>
+    <button class="btn bg2" style="width:auto;padding:8px 14px;font-size:12px" onclick="goBack()">← بازگشت</button>
+  </div>
+  <div class="pad">
+    <div class="card" style="margin-bottom:16px"><div class="cb" style="padding:14px 16px;text-align:center">
+      <div style="font-size:32px;margin-bottom:8px">📡</div>
+      <div style="font-weight:700;font-size:16px;margin-bottom:4px">نت‌یار دسکتاپ</div>
+      <div style="font-size:12px;color:var(--t3)">نسخه ۱.۰ — پشتیبانی از ویندوز، مک و لینوکس</div>
+    </div></div>
+
+    <div class="dl-card">
+      <div class="dl-icon">🪟</div>
+      <div class="dl-info">
+        <div class="dl-name">ویندوز</div>
+        <div class="dl-sub">Windows 10/11 — 64-bit</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px">فایل .exe قابل نصب</div>
+      </div>
+      <a href="#" onclick="downloadApp('windows')" class="dl-btn-sm">⬇️ دانلود</a>
+    </div>
+
+    <div class="dl-card">
+      <div class="dl-icon">🍎</div>
+      <div class="dl-info">
+        <div class="dl-name">مک (macOS)</div>
+        <div class="dl-sub">macOS 12+ (Intel + Apple Silicon)</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px">فایل .dmg</div>
+      </div>
+      <a href="#" onclick="downloadApp('mac')" class="dl-btn-sm">⬇️ دانلود</a>
+    </div>
+
+    <div class="dl-card">
+      <div class="dl-icon">🐧</div>
+      <div class="dl-info">
+        <div class="dl-name">لینوکس</div>
+        <div class="dl-sub">Ubuntu 20.04+ / Debian</div>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px">فایل .AppImage</div>
+      </div>
+      <a href="#" onclick="downloadApp('linux')" class="dl-btn-sm">⬇️ دانلود</a>
+    </div>
+
+    <div class="card" style="margin-top:4px"><div class="cb" style="padding:16px">
+      <div class="stitle">نصب روی موبایل (PWA)</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.7">
+        <strong style="color:var(--text)">اندروید (Chrome):</strong> منوی ⋮ ← Add to Home Screen<br>
+        <strong style="color:var(--text)">آیفون (Safari):</strong> آیکون Share ← Add to Home Screen
+      </div>
+      <button class="btn bg2" style="margin-top:12px" onclick="doInstall()">📲 نصب روی این دستگاه</button>
+    </div></div>
+  </div>
+</div>
+
+</div><!-- /screens -->
+
+<!-- NAV -->
+<nav id="nav">
+  <button class="nb on" id="nb-mine" onclick="go('mine')"><span class="ni">🌐</span><span>اینترنت من</span></button>
+  <button class="nb" id="nb-share" onclick="go('share')"><span class="ni">🔗</span><span>اشتراک</span></button>
+  <button class="nb" id="nb-vpn" onclick="go('vpn')"><span class="ni">🛡️</span><span>VPN</span></button>
+  <button class="nb" id="nb-settings" onclick="go('settings')"><span class="ni">⚙️</span><span>تنظیمات</span></button>
+</nav>
+
+<!-- Install banner -->
+<div id="ib">
+  <span style="font-size:26px">📱</span>
+  <div style="flex:1"><div style="font-size:13px;font-weight:700">نصب نت‌یار روی گوشی</div><div style="font-size:11px;color:var(--t3)">مثل اپ واقعی</div></div>
+  <button style="background:linear-gradient(135deg,var(--c),var(--c2));color:#000;border:none;border-radius:9px;padding:8px 14px;font-family:'Vazirmatn',sans-serif;font-weight:700;font-size:12px;cursor:pointer" onclick="doInstall()">نصب</button>
+  <button style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:20px" onclick="document.getElementById('ib').classList.remove('show')">×</button>
+</div>
+
+<script>
+// ═══════════════════ CONFIG ═══════════════════
+const API = '';
+const SITE = 'https://netyard.vercel.app';
+const NAVS = ['mine','share','vpn','settings'];
+let token = localStorage.getItem('ny_tok');
+let myUser = JSON.parse(localStorage.getItem('ny_usr')||'null');
+let isAdmin = localStorage.getItem('ny_adm') === '1';
+let connected = false;
+let deferredInstall = null;
+let autoTimer = null;
+let prevScreen = 'mine';
+
+// ═══════════════════ HELPERS ═══════════════════
+function toast(msg,t='i'){const e=document.getElementById('toast');e.textContent=msg;e.className=`toast show t${t}`;clearTimeout(e._t);e._t=setTimeout(()=>e.className='toast',3200)}
+async function req(method,path,body){
+  const o={method,headers:{'Content-Type':'application/json'}};
+  if(token)o.headers['Authorization']='Bearer '+token;
+  if(body)o.body=JSON.stringify(body);
+  const r=await fetch(API+path,o);return r.json();
+}
+const api = req;
+
+// ═══════════════════ SCREEN ROUTING ═══════════════════
+function showScreen(id, useNav=true){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('off'));
+  document.getElementById('sc-'+id).classList.remove('off');
+  if(useNav && NAVS.includes(id)){
+    document.getElementById('nav').classList.add('show');
+    NAVS.forEach(n=>{document.getElementById('nb-'+n)?.classList.toggle('on',n===id)});
+  } else if(id==='auth'||id==='download'){
+    document.getElementById('nav').classList.remove('show');
+  }
+}
+function go(sc){ prevScreen=sc; showScreen(sc); if(sc==='share')loadShare(); if(sc==='settings')loadSettings(); }
+function goBack(){ showScreen(prevScreen, NAVS.includes(prevScreen)); if(NAVS.includes(prevScreen)) document.getElementById('nav').classList.add('show'); }
+function goDownload(){ showScreen('download', false); }
+
+// ═══════════════════ INIT ═══════════════════
+window.addEventListener('DOMContentLoaded', ()=>{
+  if(token && myUser){
+    if(isAdmin){ initAdmin(); }
+    else { initApp(); }
+  } else {
+    showScreen('auth', false);
+  }
+  window.addEventListener('beforeinstallprompt', e=>{
+    e.preventDefault(); deferredInstall=e;
+    setTimeout(()=>document.getElementById('ib').classList.add('show'),4000);
+  });
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  // Check join param
+  const jid = new URLSearchParams(location.search).get('join');
+  if(jid && token){
+    history.replaceState({},'','/');
+    setTimeout(()=>{ go('share'); document.getElementById('join-inp').value=location.origin+'/?join='+jid; toast('لینک دعوت پیدا شد! پیوستن را بزنید','i'); },600);
+  }
+});
+
+function initApp(){
+  document.getElementById('nav').classList.add('show');
+  showScreen('mine');
+  if(myUser){
+    document.getElementById('hdr-phone').textContent = myUser.phone||'';
+    document.getElementById('avt-btn').textContent = (myUser.phone||'').slice(-2);
+  }
+  doRefresh();
+  autoTimer = setInterval(()=>{ if(document.getElementById('auto-rf').classList.contains('on')) doRefresh(); },30000);
+}
+
+function initAdmin(){
+  document.getElementById('nav').classList.remove('show');
+  showScreen('admin', false);
+  document.getElementById('adm-sub').textContent = 'ادمین: ' + (myUser?.email||'');
+  loadUsers();
+}
+
+// ═══════════════════ AUTH TABS ═══════════════════
+function switchAuthTab(t){
+  ['login','register','admin'].forEach(x=>{
+    document.getElementById('tab-'+x).style.display = x===t?'':'none';
+    document.querySelectorAll('.at').forEach((btn,i)=>{ if(['login','register','admin'][i]===t) btn.classList.add('on'); else btn.classList.remove('on'); });
+  });
+}
+
+// ═══════════════════ REGISTER ═══════════════════
+// ════════════ REGISTER ════════════
+async function doRegister(){
+  const phone      = document.getElementById('r-phone').value.trim();
+  const email      = document.getElementById('r-email').value.trim();
+  const nationalId = document.getElementById('r-nid').value.trim();
+  const fatherPhone= document.getElementById('r-father').value.trim();
+
+  if(!phone||!email||!nationalId||!fatherPhone){toast('همه فیلدها را پر کنید','e');return;}
+  if(!/^09\d{9}$/.test(phone)){toast('شماره موبایل باید ۱۱ رقم و با ۰۹ شروع شود','e');return;}
+  if(!/^\d{10}$/.test(nationalId)){toast('کد ملی باید ۱۰ رقم باشد','e');return;}
+  if(!/^09\d{9}$/.test(fatherPhone)){toast('شماره موبایل پدر نامعتبر است','e');return;}
+
+  const btn=document.querySelector('#tab-register button.bp');
+  const origText=btn.textContent; btn.textContent='⏳ در حال ارسال...'; btn.disabled=true;
+  try{
+    const password = document.getElementById('r-pass').value;
+    const confirmPassword = document.getElementById('r-pass2').value;
+    if(!password || password.length < 6){toast('رمز عبور باید حداقل ۶ کاراکتر باشد','e');return;}
+    if(password !== confirmPassword){toast('رمز عبور و تکرار آن یکسان نیستند','e');return;}
+    const d=await api('POST','/api/auth/register',{phone,email,nationalId,fatherPhone,password,confirmPassword});
+    if(d.error){toast(d.error,'e');return;}
+    window._regPhone=phone;
+    if(d.otpPageUrl){
+      const w=window.open(d.otpPageUrl,'_blank');
+      if(!w){toast('⚠️ Pop-up مسدود شد — در تب جدید باز کنید: '+d.otpPageUrl,'e');}
+    }
+    document.getElementById('rs1').style.display='none';
+    document.getElementById('rs2').style.display='';
+    toast('✅ صفحه کد تایید باز شد','s');
+  }catch(e){toast('خطا در اتصال به سرور','e');console.error(e);}
+  finally{btn.textContent=origText;btn.disabled=false;}
+}
+
+async function doVerifyRegister(){
+  const phone=window._regPhone||document.getElementById('r-phone').value.trim();
+  const otp=document.getElementById('r-otp').value.trim();
+  if(!otp){toast('کد تایید را وارد کنید','e');return;}
+  try{
+    const d=await api('POST','/api/auth/verify-register',{phone,otp});
+    if(d.error){toast(d.error,'e');return;}
+    token=d.token; myUser=d.user; isAdmin=false;
+    localStorage.setItem('ny_tok',token);
+    localStorage.setItem('ny_usr',JSON.stringify(myUser));
+    localStorage.removeItem('ny_adm');
+    toast('ثبت‌نام موفق ✅','s');
+    initApp();
+  }catch(e){toast('خطا در اتصال به سرور','e');console.error(e);}
+}
+
+// ════════════ LOGIN ════════════
+async function doLogin(){
+  const phone=document.getElementById('l-phone').value.trim();
+  if(!phone){toast('شماره موبایل را وارد کنید','e');return;}
+  if(!/^09\d{9}$/.test(phone)){toast('شماره باید ۱۱ رقم و با ۰۹ شروع شود','e');return;}
+
+  const btn=document.querySelector('#tab-login button.bp');
+  const origText=btn.textContent; btn.textContent='⏳ در حال ارسال...'; btn.disabled=true;
+  try{
+    const password = document.getElementById('l-pass').value;
+    if(!password){toast('رمز عبور را وارد کنید','e');return;}
+    const d=await api('POST','/api/auth/login',{phone,password});
+    if(d.success && d.token){
+      token=d.token; myUser=d.user; isAdmin=false;
+      localStorage.setItem('ny_tok',token);
+      localStorage.setItem('ny_usr',JSON.stringify(myUser));
+      localStorage.removeItem('ny_adm');
+      toast('خوش آمدید ✅','s');
+      initApp();
+      return;
+    }
+    if(d.error){toast(d.error,'e');return;}
+    window._loginPhone=phone;
+    if(d.otpPageUrl){
+      const w=window.open(d.otpPageUrl,'_blank');
+      if(!w){toast('⚠️ Pop-up مسدود شد — در تب جدید باز کنید','e');}
+    }
+    document.getElementById('ls1').style.display='none';
+    document.getElementById('ls2').style.display='';
+    toast('✅ صفحه کد تایید باز شد','s');
+  }catch(e){toast('خطا در اتصال به سرور','e');console.error(e);}
+  finally{btn.textContent=origText;btn.disabled=false;}
+}
+
+async function doVerifyLogin(){
+  const phone=window._loginPhone||document.getElementById('l-phone').value.trim();
+  const otp=document.getElementById('l-otp').value.trim();
+  if(!otp){toast('کد تایید را وارد کنید','e');return;}
+  try{
+    const d=await api('POST','/api/auth/verify-login',{phone,otp});
+    if(d.error){toast(d.error,'e');return;}
+    token=d.token; myUser=d.user; isAdmin=false;
+    localStorage.setItem('ny_tok',token);
+    localStorage.setItem('ny_usr',JSON.stringify(myUser));
+    localStorage.removeItem('ny_adm');
+    toast('خوش آمدید ✅','s');
+    initApp();
+  }catch(e){toast('خطا در اتصال به سرور','e');console.error(e);}
+}
+
+// ════════════ ADMIN LOGIN ════════════
+async function doAdminLogin(){
+  const email   =document.getElementById('a-email').value.trim();
+  const password=document.getElementById('a-pass').value;
+  if(!email||!password){toast('ایمیل و رمز را وارد کنید','e');return;}
+  try{
+    const d=await api('POST','/api/admin/login',{email,password});
+    if(d.error){toast(d.error,'e');return;}
+    token=d.token; myUser=d.admin; isAdmin=true;
+    localStorage.setItem('ny_tok',token);
+    localStorage.setItem('ny_usr',JSON.stringify(d.admin));
+    localStorage.setItem('ny_adm','1');
+    toast('ورود ادمین موفق ✅','s');
+    initAdmin();
+  }catch(e){toast('خطا در اتصال به سرور','e');console.error(e);}
+}
+function adminLogout(){ doLogout(); }
+function doLogout(){
+  if(!confirm('خروج از حساب؟'))return;
+  localStorage.clear(); token=null; myUser=null; isAdmin=false;
+  clearInterval(autoTimer);
+  document.getElementById('nav').classList.remove('show');
+  document.getElementById('ls2').style.display='none';
+  document.getElementById('ls1').style.display='';
+  showScreen('auth',false);
+  toast('خروج موفق','i');
+}
+
+// ═══════════════════ NET STATUS ═══════════════════
+function toggleConn(){
+  if(connected){ connected=false; setBig('off'); toast('اتصال قطع شد','i'); }
+  else{
+    setBig('go');
+    setTimeout(()=>{ connected=true; setBig('on'); doRefresh(); toast('اینترنت وصل شد ✅','s'); },1400);
+  }
+}
+function setBig(s){
+  const b=document.getElementById('big'),i=document.getElementById('bic'),l=document.getElementById('blb');
+  b.className='big '+s;
+  i.textContent=s==='go'?'⏳':'⏻';
+  l.textContent=s==='on'?'متصل':s==='go'?'اتصال...':'قطع';
+}
+async function doRefresh(){
+  const btn=document.getElementById('rfbtn');
+  btn.innerHTML='<span class="spin"></span>'; btn.disabled=true;
+  const online=navigator.onLine;
+  const badge=document.getElementById('main-badge');
+  const st=document.getElementById('main-status');
+  if(!online){
+    badge.className='badge br'; st.textContent='اینترنت قطع است';
+    document.getElementById('my-ip').textContent='—';
+    ['i-country','i-city','i-isp','i-type','i-speed'].forEach(id=>document.getElementById(id).textContent='—');
+    btn.innerHTML='🔄 بروزرسانی'; btn.disabled=false; return;
+  }
+  if(navigator.connection){
+    const c=navigator.connection;
+    const tm={wifi:'Wi-Fi 📶',cellular:'سلولار 📱',ethernet:'کابل 🔌'};
+    const em={'slow-2g':'2G کند','2g':'2G','3g':'3G','4g':'4G/LTE'};
+    const t=tm[c.type]||'نامشخص';
+    const e=em[c.effectiveType]||'';
+    document.getElementById('i-type').textContent=e?`${t} (${e})`:t;
+    document.getElementById('ct-icon').textContent=c.type==='wifi'?'📶':c.type==='cellular'?'📱':'🌐';
+    document.getElementById('ct-text').textContent=c.type==='wifi'?'Wi-Fi':c.type==='cellular'?'سلولار':'—';
+    if(c.downlink) document.getElementById('i-speed').textContent=c.downlink+' Mbps';
+  }
+  try{
+    const d=await req('GET','/api/ipinfo');
+    if(d.ip){ document.getElementById('my-ip').textContent=d.ip; badge.className='badge bg'; st.textContent='اینترنت متصل است'; }
+    if(d.country_name) document.getElementById('i-country').textContent=d.country_name+(d.country_code?' ('+d.country_code+')':'');
+    if(d.city) document.getElementById('i-city').textContent=d.city;
+    if(d.org||d.isp) document.getElementById('i-isp').textContent=d.org||d.isp;
+  }catch{
+    badge.className='badge by'; st.textContent='اینترنت محدود';
+    document.getElementById('my-ip').textContent='خطا';
+  }
+  btn.innerHTML='🔄 بروزرسانی'; btn.disabled=false;
+}
+window.addEventListener('online',()=>{ toast('✅ اینترنت وصل شد','s'); doRefresh(); });
+window.addEventListener('offline',()=>{ document.getElementById('main-badge').className='badge br'; document.getElementById('main-status').textContent='اینترنت قطع است'; toast('❌ اینترنت قطع شد','e'); });
+
+// ═══════════════════ SHARE ═══════════════════
+async function createLink(){
+  try{
+    const d=await req('POST','/api/share/create');
+    if(d.error){toast(d.error,'e');return;}
+    toast('لینک ساخته شد!','s'); loadShare();
+  }catch{toast('خطا','e');}
+}
+async function joinLink(){
+  let v=document.getElementById('join-inp').value.trim();
+  const m=v.match(/[?&]join=([a-f0-9-]+)/);
+  const id=m?m[1]:v;
+  if(!id){toast('لینک را وارد کنید','e');return;}
+  try{
+    const d=await req('POST',`/api/share/join/${id}`);
+    if(d.error){toast(d.error,'e');return;}
+    toast('✅ متصل شدید','s');
+    document.getElementById('join-inp').value='';
+    loadShare();
+  }catch{toast('خطا','e');}
+}
+async function deleteLink(id){
+  try{ await req('DELETE',`/api/share/${id}`); toast('حذف شد','i'); loadShare(); }catch{toast('خطا','e');}
+}
+async function loadShare(){
+  try{
+    const d=await req('GET','/api/share/status');
+    if(d.error) return;
+    const lc=document.getElementById('my-links');
+    lc.innerHTML=d.myLinks?.length?d.myLinks.map(l=>`
+      <div class="sl-box">
+        <span class="sl-txt">${location.origin}/?join=${l.linkId}</span>
+        <button class="cp-btn" onclick="copyTxt(l.link || `${SITE}/?join=${l.linkId}`)">کپی</button>
+        <button class="del-btn" onclick="deleteLink('${l.linkId}')">حذف</button>
+      </div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:10px">${l.connectedUsers.length} نفر متصل</div>
+    `).join(''):'<p style="font-size:12px;color:var(--t3);margin-bottom:12px">هنوز لینکی نساختید</p>';
+
+    if(d.connectedTo?.length){
+      document.getElementById('ct-card').style.display='';
+      document.getElementById('ct-list').innerHTML=d.connectedTo.map(c=>`
+        <div class="cu"><div class="ua">${c.ownerPhone.slice(-2)}</div><div><div class="user-phone" style="font-size:13px;font-weight:600;direction:ltr">${c.ownerPhone}</div><div style="font-size:11px;color:var(--t3)">در حال استفاده</div></div><span class="badge bg" style="margin-right:auto;font-size:11px">متصل</span></div>
+      `).join('');
+    } else document.getElementById('ct-card').style.display='none';
+
+    const all=d.myLinks?.flatMap(l=>l.connectedUsers.map(u=>({phone:u,lid:l.linkId})))||[];
+    if(all.length){
+      document.getElementById('mc-card').style.display='';
+      document.getElementById('mc-list').innerHTML=all.map(u=>`
+        <div class="cu"><div class="ua">${u.phone.slice(-2)}</div><div><div style="font-size:13px;font-weight:600;direction:ltr">${u.phone}</div><div style="font-size:11px;color:var(--t3)">از اینترنت شما استفاده می‌کند</div></div><span class="badge bb" style="margin-right:auto;font-size:11px">فعال</span></div>
+      `).join('');
+    } else document.getElementById('mc-card').style.display='none';
+  }catch{}
+}
+function copyTxt(t){ navigator.clipboard.writeText(t).then(()=>toast('کپی شد','s')).catch(()=>toast('خطا','e')); }
+
+// ═══════════════════ VPN ACCORDION ═══════════════════
+const vpns=['outline','psiphon','v2ray','warp'];
+function toggleV(id){
+  const b=document.getElementById('vb-'+id), a=document.getElementById('va-'+id), isOpen=b.classList.contains('open');
+  vpns.forEach(v=>{ document.getElementById('vb-'+v).classList.remove('open'); document.getElementById('va-'+v).style.transform=''; });
+  if(!isOpen){ b.classList.add('open'); a.style.transform='rotate(90deg)'; }
+}
+
+// ═══════════════════ ADMIN ═══════════════════
+async function loadUsers(){
+  const el=document.getElementById('users-list');
+  el.innerHTML='<div style="text-align:center;color:var(--t3);padding:20px;font-size:13px"><span class="spin"></span></div>';
+  try{
+    const d=await req('GET','/api/admin/users');
+    if(d.error){el.innerHTML='<p style="color:var(--danger)">خطا</p>';return;}
+    document.getElementById('stat-total').textContent=d.total;
+    document.getElementById('stat-active').textContent=d.users.filter(u=>u.isActive).length;
+    document.getElementById('stat-inactive').textContent=d.users.filter(u=>!u.isActive).length;
+    if(!d.users.length){el.innerHTML='<p style="text-align:center;color:var(--t3);font-size:13px;padding:20px">هیچ کاربری ثبت نشده</p>';return;}
+    el.innerHTML=d.users.map(u=>`
+      <div class="user-row" id="ur-${u.id}">
+        <div class="user-top">
+          <div class="user-av">${(u.phone||'').slice(-2)}</div>
+          <div>
+            <div class="user-phone">${u.phone}</div>
+            <div class="user-email">${u.email}</div>
+          </div>
+          <span class="badge ${u.isActive?'bg':'br'}" style="margin-right:auto;font-size:11px">${u.isActive?'فعال':'غیرفعال'}</span>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-bottom:8px">کد ملی: ${u.nationalId} | شماره پدر: ${u.fatherPhone}</div>
+        <div class="user-actions">
+          <button class="ua-btn ua-view" onclick="viewUser('${u.id}')">👁 جزئیات</button>
+          <button class="ua-btn ua-tog" onclick="toggleUser('${u.id}')">⏸ ${u.isActive?'غیرفعال':'فعال'}</button>
+          <button class="ua-btn ua-del" onclick="deleteUser('${u.id}')">🗑 حذف</button>
+        </div>
+      </div>
+    `).join('');
+  }catch{el.innerHTML='<p style="color:var(--danger)">خطا در بارگذاری</p>';}
+}
+async function viewUser(id){
+  try{
+    const d=await req('GET',`/api/admin/users/${id}`);
+    if(d.error){toast(d.error,'e');return;}
+    const u=d.user;
+    document.getElementById('modal-user-content').innerHTML=`
+      <div class="ir"><span class="ik">شماره موبایل</span><span class="iv hl" dir="ltr">${u.phone}</span></div>
+      <div class="ir"><span class="ik">ایمیل</span><span class="iv" dir="ltr">${u.email}</span></div>
+      <div class="ir"><span class="ik">کد ملی</span><span class="iv" dir="ltr">${u.nationalId}</span></div>
+      <div class="ir"><span class="ik">شماره پدر</span><span class="iv" dir="ltr">${u.fatherPhone}</span></div>
+      <div class="ir"><span class="ik">وضعیت</span><span class="iv">${u.isActive?'✅ فعال':'❌ غیرفعال'}</span></div>
+      <div class="ir"><span class="ik">تاریخ عضویت</span><span class="iv" dir="ltr">${new Date(u.createdAt).toLocaleString('fa-IR')}</span></div>
+      <div class="ir"><span class="ik">شناسه</span><span class="iv" dir="ltr" style="font-size:11px">${u.userId}</span></div>
+    `;
+    document.getElementById('modal-user').classList.remove('off');
+  }catch{toast('خطا','e');}
+}
+function closeModal(){ document.getElementById('modal-user').classList.add('off'); }
+async function deleteUser(id){
+  if(!confirm('کاربر حذف شود؟')) return;
+  try{
+    const d=await req('DELETE',`/api/admin/users/${id}`);
+    if(d.error){toast(d.error,'e');return;}
+    toast('کاربر حذف شد','s'); loadUsers();
+  }catch{toast('خطا','e');}
+}
+async function toggleUser(id){
+  try{
+    const d=await req('PATCH',`/api/admin/users/${id}/toggle`);
+    if(d.error){toast(d.error,'e');return;}
+    toast(d.isActive?'✅ کاربر فعال شد':'⏸ کاربر غیرفعال شد','s'); loadUsers();
+  }catch{toast('خطا','e');}
+}
+
+// ═══════════════════ SETTINGS ═══════════════════
+function loadSettings(){
+  if(myUser){
+    document.getElementById('s-phone').textContent=myUser.phone||'—';
+    document.getElementById('s-email').textContent=myUser.email||'—';
+    if(myUser.createdAt||myUser.joinedAt){
+      const d=new Date(myUser.createdAt||myUser.joinedAt);
+      document.getElementById('s-joined').textContent=d.toLocaleDateString('fa-IR');
+    }
+  }
+}
+
+// ═══════════════════ DOWNLOAD ═══════════════════
+function downloadApp(os){
+  const msgs={windows:'نسخه ویندوز در دست توسعه است. از نسخه وب یا PWA استفاده کنید.',mac:'نسخه مک در دست توسعه است. از نسخه وب یا PWA استفاده کنید.',linux:'نسخه لینوکس در دست توسعه است. از نسخه وب یا PWA استفاده کنید.'};
+  toast(msgs[os]||'به زودی','i');
+}
+
+// ═══════════════════ PWA INSTALL ═══════════════════
+async function doInstall(){
+  if(deferredInstall){ deferredInstall.prompt(); const{outcome}=await deferredInstall.userChoice; if(outcome==='accepted'){toast('✅ نصب شد!','s');deferredInstall=null;} document.getElementById('ib').classList.remove('show'); }
+  else toast('منوی مرورگر ← افزودن به صفحه اصلی','i');
+}
+</script>
+</body>
+</html>

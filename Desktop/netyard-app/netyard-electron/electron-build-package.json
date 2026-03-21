@@ -1,0 +1,58 @@
+{
+  "name": "netyard",
+  "version": "1.0.0",
+  "description": "نت‌یار — مدیریت هوشمند اینترنت",
+  "main": "src/main.js",
+  "author": "NetYard",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build:win":   "electron-builder --win   --x64",
+    "build:mac":   "electron-builder --mac",
+    "build:linux": "electron-builder --linux --x64",
+    "build:all":   "electron-builder -mwl"
+  },
+  "build": {
+    "appId": "com.netyard.app",
+    "productName": "NetYard",
+    "copyright": "NetYard 2025",
+    "directories": { "output": "dist" },
+    "files": [
+      "src/**/*",
+      "public/**/*",
+      "server.js",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "public/icon.ico"
+    },
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["x64","arm64"] }],
+      "icon": "public/icon.png",
+      "category": "public.app-category.utilities"
+    },
+    "linux": {
+      "target": [{ "target": "AppImage", "arch": ["x64"] }],
+      "icon": "public/icon.png",
+      "category": "Network"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "bcryptjs": "2.4.3",
+    "cors": "2.8.5",
+    "express": "4.18.2",
+    "jsonwebtoken": "9.0.2",
+    "node-fetch": "2.7.0",
+    "uuid": "9.0.0"
+  },
+  "devDependencies": {
+    "electron": "28.3.3",
+    "electron-builder": "24.13.3"
+  }
+}

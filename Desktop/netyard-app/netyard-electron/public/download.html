@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>دانلود نت‌یار</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--s1:#111827;--s2:#1a2233;--b:#1e293b;--c:#00d4ff;--c2:#7c3aed;--c3:#10b981;--c4:#f59e0b;--text:#e2e8f0;--t2:#94a3b8;--t3:#475569}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.03)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03)1px,transparent 1px);background-size:44px 44px;pointer-events:none}
+.wrap{max-width:900px;margin:0 auto;padding:30px 20px 60px;position:relative;z-index:1}
+header{text-align:center;padding:40px 0 32px}
+.logo{font-size:44px;font-weight:900;background:linear-gradient(135deg,var(--c),var(--c2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sub{font-size:13px;color:var(--t3);letter-spacing:2px;margin-top:4px}
+.hero-desc{font-size:14px;color:var(--t2);max-width:500px;margin:14px auto 0;line-height:1.7}
+.section{margin-bottom:32px}
+.sec-title{font-size:16px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sec-sub{font-size:12px;color:var(--t3);margin-bottom:16px}
+.platforms{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.plat{background:var(--s1);border:2px solid var(--b);border-radius:20px;overflow:hidden;transition:all .25s;cursor:pointer}
+.plat:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.plat.win:hover{border-color:#0078d4}
+.plat.mac:hover{border-color:#888}
+.plat.lnx:hover{border-color:var(--c3)}
+.plat.pwa:hover{border-color:var(--c)}
+.plat-head{padding:20px 18px 14px;display:flex;align-items:center;gap:14px}
+.plat-ic{font-size:40px;flex-shrink:0}
+.plat-name{font-size:16px;font-weight:800}
+.plat-meta{font-size:11px;color:var(--t3);margin-top:2px}
+.plat-body{padding:0 18px 18px}
+.plat-req{background:var(--s2);border-radius:10px;padding:11px;font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:12px}
+.plat-req strong{color:var(--text)}
+.dl-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:12px;border:none;font-family:'Vazirmatn',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;text-decoration:none}
+.dl-btn:hover{opacity:.85;transform:translateY(-1px)}
+.win-btn{background:linear-gradient(135deg,#0078d4,#1a96e8);color:#fff}
+.mac-btn{background:linear-gradient(135deg,#555,#999);color:#fff}
+.lnx-btn{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
+.pwa-btn{background:linear-gradient(135deg,var(--c),var(--c2));color:#000}
+.status{text-align:center;font-size:11px;margin-top:7px;font-weight:600}
+.status.ready{color:var(--c3)}
+.status.pending{color:var(--c4)}
+
+/* Mobile steps */
+.mobile-card{background:var(--s1);border:1px solid var(--b);border-radius:20px;overflow:hidden}
+.mobile-card::before{content:'';display:block;height:2px;background:linear-gradient(90deg,var(--c),var(--c2))}
+.mobile-body{padding:20px}
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:16px}
+.os-card{background:var(--s2);border-radius:14px;padding:14px}
+.os-title{font-size:13px;font-weight:700;margin-bottom:12px}
+.step{display:flex;gap:10px;margin-bottom:9px;align-items:flex-start}
+.step:last-child{margin-bottom:0}
+.sn{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--c),var(--c2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#000;flex-shrink:0;margin-top:2px}
+.st{font-size:12px;color:var(--t2);line-height:1.5}
+.st strong{color:var(--text)}
+
+/* Status indicator */
+#build-status{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:12px 16px;margin-bottom:20px;font-size:12px;color:var(--c4);line-height:1.6}
+#build-status.ok{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.3);color:var(--c3)}
+
+footer{text-align:center;color:var(--t3);font-size:12px;padding-top:20px;border-top:1px solid var(--b)}
+footer a{color:var(--c);text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">📡 نت‌یار</div>
+  <div class="logo-sub">دانلود اپلیکیشن</div>
+  <p class="hero-desc">نسخه دسکتاپ واقعی — نصب می‌شود و روی دستگاه شما اجرا می‌شود</p>
+</header>
+
+<div id="build-status">
+  ⏳ در حال بررسی وضعیت فایل‌های build...
+</div>
+
+<div class="section">
+  <div class="sec-title">💻 دسکتاپ — نسخه نصب‌شدنی</div>
+  <div class="sec-sub">فایل را دانلود کنید، نصب کنید، مثل هر اپلیکیشن دیگری استفاده کنید</div>
+  <div class="platforms">
+
+    <div class="plat win">
+      <div class="plat-head">
+        <div class="plat-ic">🪟</div>
+        <div><div class="plat-name">ویندوز</div><div class="plat-meta">Windows 10/11 · 64-bit</div></div>
+      </div>
+      <div class="plat-body">
+        <div class="plat-req"><strong>فرمت:</strong> فایل نصب .exe<br><strong>نصب:</strong> دوبار کلیک ← Next ← Install</div>
+        <button class="dl-btn win-btn" onclick="download('windows')">⬇️ دانلود ویندوز (.exe)</button>
+        <div class="status" id="st-win">⏳ بررسی...</div>
+      </div>
+    </div>
+
+    <div class="plat mac">
+      <div class="plat-head">
+        <div class="plat-ic">🍎</div>
+        <div><div class="plat-name">مک (macOS)</div><div class="plat-meta">macOS 12+ · Intel + Apple Silicon</div></div>
+      </div>
+      <div class="plat-body">
+        <div class="plat-req"><strong>فرمت:</strong> فایل .dmg<br><strong>نصب:</strong> باز کردن ← کشیدن به Applications</div>
+        <button class="dl-btn mac-btn" onclick="download('mac')">⬇️ دانلود مک (.dmg)</button>
+        <div class="status" id="st-mac">⏳ بررسی...</div>
+      </div>
+    </div>
+
+    <div class="plat lnx">
+      <div class="plat-head">
+        <div class="plat-ic">🐧</div>
+        <div><div class="plat-name">لینوکس</div><div class="plat-meta">Ubuntu 20.04+ · Debian · Arch</div></div>
+      </div>
+      <div class="plat-body">
+        <div class="plat-req"><strong>فرمت:</strong> .AppImage<br><strong>نصب:</strong> chmod +x ← اجرا</div>
+        <button class="dl-btn lnx-btn" onclick="download('linux')">⬇️ دانلود لینوکس (.AppImage)</button>
+        <div class="status" id="st-linux">⏳ بررسی...</div>
+      </div>
+    </div>
+
+    <div class="plat pwa">
+      <div class="plat-head">
+        <div class="plat-ic">🌐</div>
+        <div><div class="plat-name">نسخه وب</div><div class="plat-meta">همه مرورگرها · همین الان</div></div>
+      </div>
+      <div class="plat-body">
+        <div class="plat-req"><strong>مزیت:</strong> نیاز به نصب ندارد<br><strong>سازگاری:</strong> Chrome, Safari, Firefox</div>
+        <a href="/" class="dl-btn pwa-btn">🚀 باز کردن اپلیکیشن</a>
+        <div class="status ready">✅ همین الان در دسترس است</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title">📱 موبایل و تبلت — نصب PWA</div>
+  <div class="sec-sub">بدون App Store — مثل اپ واقعی نصب می‌شود</div>
+  <div class="mobile-card">
+    <div class="mobile-body">
+      <div class="steps-grid">
+        <div class="os-card">
+          <div class="os-title">🤖 اندروید (Chrome)</div>
+          <div class="step"><div class="sn">۱</div><div class="st">سایت را در <strong>Chrome</strong> باز کنید</div></div>
+          <div class="step"><div class="sn">۲</div><div class="st">منوی <strong>⋮</strong> را بزنید</div></div>
+          <div class="step"><div class="sn">۳</div><div class="st"><strong>Add to Home Screen</strong> را بزنید</div></div>
+          <div class="step"><div class="sn">۴</div><div class="st"><strong>Install</strong> را بزنید ✅</div></div>
+        </div>
+        <div class="os-card">
+          <div class="os-title">🍎 آیفون / آیپد (Safari)</div>
+          <div class="step"><div class="sn">۱</div><div class="st">سایت را در <strong>Safari</strong> باز کنید</div></div>
+          <div class="step"><div class="sn">۲</div><div class="st">آیکون <strong>Share ↑</strong> را بزنید</div></div>
+          <div class="step"><div class="sn">۳</div><div class="st"><strong>Add to Home Screen</strong> را بزنید</div></div>
+          <div class="step"><div class="sn">۴</div><div class="st"><strong>Add</strong> را بزنید ✅</div></div>
+        </div>
+        <div class="os-card">
+          <div class="os-title">💻 لپ‌تاپ (Chrome)</div>
+          <div class="step"><div class="sn">۱</div><div class="st">سایت را در <strong>Chrome</strong> باز کنید</div></div>
+          <div class="step"><div class="sn">۲</div><div class="st">آیکون <strong>نصب ⊕</strong> در نوار آدرس</div></div>
+          <div class="step"><div class="sn">۳</div><div class="st">یا منو ← <strong>Install NetYard</strong></div></div>
+          <div class="step"><div class="sn">۴</div><div class="st"><strong>Install</strong> را بزنید ✅</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>📡 نت‌یار v1.0</p>
+  <p style="margin-top:6px"><a href="/">← برگشت به اپلیکیشن</a></p>
+</footer>
+</div>
+
+<script>
+async function checkBuilds() {
+  const oses = ['windows', 'mac', 'linux'];
+  let anyReady = false;
+  for (const os of oses) {
+    try {
+      const r = await fetch('/download/' + os, { method: 'HEAD' });
+      const el = document.getElementById('st-' + os);
+      if (r.ok) {
+        el.textContent = '✅ آماده دانلود';
+        el.className = 'status ready';
+        anyReady = true;
+      } else {
+        el.textContent = '⏳ در دست توسعه — به زودی';
+        el.className = 'status pending';
+      }
+    } catch {
+      const el = document.getElementById('st-' + os);
+      if (el) { el.textContent = '⏳ در دست توسعه'; el.className = 'status pending'; }
+    }
+  }
+  const bs = document.getElementById('build-status');
+  if (anyReady) {
+    bs.textContent = '✅ برخی نسخه‌های دسکتاپ آماده دانلود هستند';
+    bs.className = 'ok';
+  } else {
+    bs.innerHTML = '⚙️ نسخه‌های دسکتاپ هنوز build نشده‌اند. <strong>نسخه وب</strong> همین الان کار می‌کند.<br>' +
+      'برای build: <code style="background:#1a2233;padding:2px 6px;border-radius:4px;font-family:monospace;color:#00d4ff">chmod +x build-electron.sh && ./build-electron.sh</code>';
+  }
+}
+
+function download(os) {
+  const link = document.createElement('a');
+  link.href = '/download/' + os;
+  link.click();
+}
+
+checkBuilds();
+</script>
+</body>
+</html>
