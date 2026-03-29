@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تغذیه سالم — نانا</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .page-tabs { display:flex; gap:8px; margin-bottom:28px; border-bottom:1px solid var(--border); padding-bottom:16px; flex-wrap:wrap; }
+    .page-tab { background:none; border:none; color:var(--text2); font-family:'Vazirmatn',sans-serif; font-size:15px; font-weight:600; padding:10px 20px; border-radius:10px; cursor:pointer; transition:all .2s; }
+    .page-tab.active { background:var(--green); color:white; }
+    .page-tab:hover:not(.active) { background:var(--bg3); color:var(--text); }
+    .tab-section { display:none; }
+    .tab-section.active { display:block; }
+
+    .log-form-card { background:var(--card); border:1px solid var(--green); border-radius:14px; padding:22px; margin-bottom:28px; }
+    .log-form-card h3 { font-size:16px; margin-bottom:16px; color:var(--green-light); }
+    .form-inline { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:12px; }
+    .log-input { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:10px 14px; border-radius:9px; font-family:'Vazirmatn',sans-serif; font-size:14px; outline:none; width:100%; }
+    .log-input:focus { border-color:var(--green); }
+    .log-btn { background:var(--green); color:white; border:none; border-radius:9px; padding:10px 22px; font-family:'Vazirmatn',sans-serif; font-size:14px; font-weight:600; cursor:pointer; }
+    .log-btn:hover { background:var(--green-light); }
+
+    .log-item { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 18px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+    .log-item:hover { border-color:var(--green); }
+    .log-item-info { flex:1; }
+    .log-item-title { font-size:15px; font-weight:700; margin-bottom:4px; color:var(--green-light); }
+    .log-item-meta { display:flex; flex-wrap:wrap; gap:8px; font-size:13px; color:var(--text2); }
+    .log-meta-tag { background:var(--bg3); border-radius:6px; padding:2px 10px; }
+    .log-item-date { font-size:12px; color:var(--text2); margin-top:6px; }
+    .log-del-btn { background:rgba(220,50,50,.12); color:#ff6b6b; border:1px solid rgba(220,50,50,.25); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:13px; flex-shrink:0; }
+    .btn-log-food { background:rgba(45,158,107,.2); color:var(--green-light); border:1px solid rgba(45,158,107,.3); padding:7px 14px; border-radius:8px; font-family:'Vazirmatn',sans-serif; font-size:13px; cursor:pointer; transition:all .2s; }
+    .btn-log-food:hover { background:var(--green); color:white; }
+
+    .meal-type-badge { padding:3px 12px; border-radius:12px; font-size:12px; font-weight:600; }
+    .meal-type-breakfast { background:rgba(244,167,38,.2); color:var(--accent); }
+    .meal-type-lunch { background:rgba(45,158,107,.2); color:var(--green-light); }
+    .meal-type-dinner { background:rgba(100,100,200,.2); color:#9090ff; }
+    .meal-type-snack { background:rgba(200,100,100,.2); color:#ff9090; }
+    .meal-type-other { background:var(--bg3); color:var(--text2); }
+
+    .daily-summary { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px; margin-bottom:24px; }
+    .daily-summary h3 { font-size:15px; margin-bottom:14px; }
+    .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .summary-item { text-align:center; }
+    .summary-num { font-size:24px; font-weight:800; color:var(--green-light); }
+    .summary-label { font-size:12px; color:var(--text2); margin-top:3px; }
+
+    .qlog-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); z-index:500; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .qlog-overlay.hidden { display:none; }
+    .qlog-box { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:26px; width:100%; max-width:460px; }
+    .qlog-close { float:left; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text2); }
+    .empty-logs { text-align:center; padding:40px; color:var(--text2); font-size:14px; }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <!-- Quick Log Modal -->
+  <div class="qlog-overlay hidden" id="qlogOverlay">
+    <div class="qlog-box">
+      <button class="qlog-close" onclick="closeQLog()">✕</button>
+      <h3>🥗 ثبت وعده از: <span id="qlogPlanTitle" style="color:var(--green-light)"></span></h3>
+      <input type="hidden" id="qlogPlanId">
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">نوع وعده</label>
+        <select class="log-input" id="qlogMealType">
+          <option value="breakfast">🌅 صبحانه</option>
+          <option value="lunch">☀️ ناهار</option>
+          <option value="dinner">🌙 شام</option>
+          <option value="snack">🍎 میان‌وعده</option>
+          <option value="other">سایر</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">غذاهای خورده شده *</label>
+        <input class="log-input" id="qlogFoods" placeholder="مثلاً: برنج، مرغ، سالاد">
+      </div>
+      <div class="form-inline">
+        <div>
+          <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">کالری (تخمینی)</label>
+          <input class="log-input" id="qlogCal" placeholder="مثلاً: ۵۰۰">
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">یادداشت</label>
+        <input class="log-input" id="qlogNote" placeholder="احساس بعد از غذا...">
+      </div>
+      <button onclick="submitQLog()" class="log-btn" style="margin-top:16px;width:100%">✅ ثبت وعده</button>
+    </div>
+  </div>
+
+  <main class="content-page">
+    <div class="container">
+      <div class="page-header">
+        <h1>🥗 تغذیه سالم</h1>
+        <p>برنامه رژیم + ثبت وعده‌های غذایی روزانه</p>
+      </div>
+
+      <div class="page-tabs">
+        <button class="page-tab active" onclick="switchTab('plans',this)">📋 برنامه‌های غذایی</button>
+        <button class="page-tab" onclick="switchTab('mylog',this)">📊 دفترچه غذایی من</button>
+        <div id="adminTabBtn" style="display:none">
+          <button class="page-tab" onclick="switchTab('add',this)">➕ افزودن برنامه</button>
+        </div>
+      </div>
+
+      <!-- Tab: Plans -->
+      <div class="tab-section active" id="tab-plans">
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="filterNut('all',this)">همه</button>
+          <button class="filter-tab" onclick="filterNut('diet',this)">رژیم لاغری</button>
+          <button class="filter-tab" onclick="filterNut('muscle',this)">عضله‌سازی</button>
+          <button class="filter-tab" onclick="filterNut('healthy',this)">سالم‌خوری</button>
+          <button class="filter-tab" onclick="filterNut('recipe',this)">دستور پخت</button>
+        </div>
+        <div class="items-grid" id="nutGrid">
+          <div class="empty-state"><span>⏳</span><p>در حال بارگذاری...</p></div>
+        </div>
+      </div>
+
+      <!-- Tab: My Log -->
+      <div class="tab-section" id="tab-mylog">
+
+        <div id="dailySummary" class="daily-summary" style="display:none">
+          <h3>📅 خلاصه امروز</h3>
+          <div class="summary-grid">
+            <div class="summary-item"><div class="summary-num" id="sumMeals">0</div><div class="summary-label">وعده</div></div>
+            <div class="summary-item"><div class="summary-num" id="sumCal">0</div><div class="summary-label">کالری</div></div>
+            <div class="summary-item"><div class="summary-num" id="sumBreakfast">—</div><div class="summary-label">صبحانه</div></div>
+            <div class="summary-item"><div class="summary-num" id="sumDinner">—</div><div class="summary-label">شام</div></div>
+          </div>
+        </div>
+
+        <div class="log-form-card">
+          <h3>➕ ثبت وعده غذایی جدید</h3>
+          <div class="form-inline">
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">نوع وعده</label>
+              <select class="log-input" id="logMealType">
+                <option value="breakfast">🌅 صبحانه</option>
+                <option value="lunch">☀️ ناهار</option>
+                <option value="dinner">🌙 شام</option>
+                <option value="snack">🍎 میان‌وعده</option>
+                <option value="other">سایر</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">کالری (تخمینی)</label>
+              <input class="log-input" id="logCal" placeholder="مثلاً: ۵۰۰ کیلوکالری">
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">غذاهای خورده شده *</label>
+            <input class="log-input" id="logFoods" placeholder="مثلاً: نان و پنیر، عسل، چای">
+          </div>
+          <div style="margin-bottom:12px">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">یادداشت</label>
+            <input class="log-input" id="logNote" placeholder="احساس بعد از غذا، سیری و...">
+          </div>
+          <button onclick="addLog()" class="log-btn">✅ ثبت وعده</button>
+        </div>
+
+        <h3 style="font-size:17px;margin-bottom:16px">📖 دفترچه غذایی من</h3>
+        <div id="myLogList">
+          <div class="empty-logs">⏳ در حال بارگذاری...</div>
+        </div>
+      </div>
+
+      <!-- Tab: Add (Admin) -->
+      <div class="tab-section" id="tab-add">
+        <div class="log-form-card">
+          <h3>➕ افزودن برنامه غذایی جدید</h3>
+          <div class="form-inline">
+            <div style="grid-column:1/-1">
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">عنوان *</label>
+              <input class="log-input" id="aTitle">
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">دسته‌بندی</label>
+              <select class="log-input" id="aCat">
+                <option value="diet">رژیم لاغری</option>
+                <option value="muscle">عضله‌سازی</option>
+                <option value="healthy">سالم‌خوری</option>
+                <option value="recipe">دستور پخت</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin:10px 0">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">توضیحات کوتاه</label>
+            <textarea class="log-input" id="aDesc" rows="2"></textarea>
+          </div>
+          <div style="margin:10px 0">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">متن کامل برنامه</label>
+            <textarea class="log-input" id="aContent" rows="5" placeholder="مواد غذایی، مقدار، زمان مصرف..."></textarea>
+          </div>
+          <div class="form-inline">
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">تصویر</label>
+              <input type="file" class="log-input" id="aImg" accept="image/*">
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">ویدیو</label>
+              <input type="file" class="log-input" id="aVid" accept="video/*">
+            </div>
+          </div>
+          <button onclick="addNutrition()" class="log-btn" style="margin-top:14px">💾 ذخیره برنامه</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer"></div>
+  <script src="/js/shared.js"></script>
+  <script>
+    let currentUser = null;
+    let allNutrition = [];
+    let currentFilter = 'all';
+
+    (async () => {
+      currentUser = await requireLogin();
+      if (!currentUser) return;
+      injectLayout(currentUser);
+      if (currentUser.role === 'admin') document.getElementById('adminTabBtn').style.display = 'block';
+      loadNutrition();
+      loadMyLog();
+    })();
+
+    async function loadNutrition() {
+      allNutrition = await fetch('/api/nutrition').then(r => r.json());
+      renderNutrition();
+    }
+
+    function renderNutrition() {
+      const catMap = { diet:'رژیم لاغری', muscle:'عضله‌سازی', healthy:'سالم‌خوری', recipe:'دستور پخت' };
+      const data = currentFilter === 'all' ? allNutrition : allNutrition.filter(n => n.category === currentFilter);
+      const grid = document.getElementById('nutGrid');
+      if (data.length === 0) { grid.innerHTML = '<div class="empty-state"><span>🥗</span><p>برنامه‌ای یافت نشد</p></div>'; return; }
+      grid.innerHTML = data.map(n => `
+        <div class="item-card">
+          ${n.image ? `<div class="item-media"><img src="${n.image}" alt="${n.title}" loading="lazy"></div>` : '<div class="item-media no-media">🥗</div>'}
+          <div class="item-body">
+            <div class="item-category">${catMap[n.category] || n.category}</div>
+            <h3>${n.title}</h3>
+            <p>${n.description || ''}</p>
+            ${n.content ? `<div class="item-content">${n.content}</div>` : ''}
+            ${n.video ? `<video controls class="item-video"><source src="${n.video}"></video>` : ''}
+            <div class="item-actions">
+              <button class="btn-log-food" onclick="openQLog('${n.id}','${n.title.replace(/'/g,"\\'")}')">🍽️ خوردم این رو!</button>
+              <button class="btn-save" onclick="saveItem('nutrition','${n.id}',this)">🗂️ ذخیره</button>
+              ${currentUser.role === 'admin' ? `<button class="btn-delete" onclick="deleteNut('${n.id}',this)">🗑️</button>` : ''}
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    function filterNut(cat, btn) {
+      currentFilter = cat;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderNutrition();
+    }
+
+    // Quick log from plan card
+    function openQLog(id, title) {
+      document.getElementById('qlogPlanId').value = id;
+      document.getElementById('qlogPlanTitle').textContent = title;
+      document.getElementById('qlogFoods').value = '';
+      document.getElementById('qlogCal').value = '';
+      document.getElementById('qlogNote').value = '';
+      document.getElementById('qlogOverlay').classList.remove('hidden');
+    }
+    function closeQLog() { document.getElementById('qlogOverlay').classList.add('hidden'); }
+    document.getElementById('qlogOverlay').addEventListener('click', e => { if (e.target.id === 'qlogOverlay') closeQLog(); });
+
+    async function submitQLog() {
+      const foods = document.getElementById('qlogFoods').value.trim();
+      if (!foods) { alert('غذاهای خورده شده را وارد کنید'); return; }
+      const body = {
+        planId: document.getElementById('qlogPlanId').value,
+        planTitle: document.getElementById('qlogPlanTitle').textContent,
+        foods, calories: document.getElementById('qlogCal').value,
+        mealType: document.getElementById('qlogMealType').value,
+        note: document.getElementById('qlogNote').value
+      };
+      await fetch('/api/activity/nutrition', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      closeQLog();
+      loadMyLog();
+    }
+
+    // Manual log
+    async function addLog() {
+      const foods = document.getElementById('logFoods').value.trim();
+      if (!foods) { alert('غذاهای خورده شده را وارد کنید'); return; }
+      const body = {
+        foods, calories: document.getElementById('logCal').value,
+        mealType: document.getElementById('logMealType').value,
+        note: document.getElementById('logNote').value
+      };
+      await fetch('/api/activity/nutrition', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      document.getElementById('logFoods').value = '';
+      document.getElementById('logCal').value = '';
+      document.getElementById('logNote').value = '';
+      loadMyLog();
+    }
+
+    async function loadMyLog() {
+      const logs = await fetch('/api/activity/nutrition').then(r => r.json());
+      const container = document.getElementById('myLogList');
+      const mealLabels = { breakfast:'🌅 صبحانه', lunch:'☀️ ناهار', dinner:'🌙 شام', snack:'🍎 میان‌وعده', other:'سایر' };
+
+      // daily summary
+      const today = new Date().toDateString();
+      const todayLogs = logs.filter(l => new Date(l.date).toDateString() === today);
+      if (todayLogs.length > 0) {
+        document.getElementById('dailySummary').style.display = 'block';
+        document.getElementById('sumMeals').textContent = todayLogs.length;
+        const totalCal = todayLogs.reduce((s, l) => s + (parseInt(l.calories) || 0), 0);
+        document.getElementById('sumCal').textContent = totalCal || '—';
+        document.getElementById('sumBreakfast').textContent = todayLogs.find(l => l.mealType === 'breakfast') ? '✅' : '❌';
+        document.getElementById('sumDinner').textContent = todayLogs.find(l => l.mealType === 'dinner') ? '✅' : '❌';
+      }
+
+      if (logs.length === 0) {
+        container.innerHTML = '<div class="empty-logs">📋 هنوز وعده‌ای ثبت نکرده‌اید<br><small>از دکمه «خوردم این رو!» روی هر برنامه استفاده کنید</small></div>';
+        return;
+      }
+
+      // Group by date
+      const grouped = {};
+      logs.forEach(l => {
+        const d = new Date(l.date).toLocaleDateString('fa-IR');
+        if (!grouped[d]) grouped[d] = [];
+        grouped[d].push(l);
+      });
+
+      container.innerHTML = Object.entries(grouped).map(([date, items]) => `
+        <div style="margin-bottom:20px">
+          <div style="font-size:13px;color:var(--text2);font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)">📅 ${date}</div>
+          ${items.map(l => `
+            <div class="log-item">
+              <div class="log-item-info">
+                <div class="log-item-title">
+                  <span class="meal-type-badge meal-type-${l.mealType}">${mealLabels[l.mealType]||l.mealType}</span>
+                  ${l.planTitle ? ` · ${l.planTitle}` : ''}
+                </div>
+                <div style="margin-top:6px;font-size:14px">🍽️ ${l.foods}</div>
+                <div class="log-item-meta" style="margin-top:6px">
+                  ${l.calories ? `<span class="log-meta-tag">🔥 ${l.calories} کیلوکالری</span>` : ''}
+                  ${l.note ? `<span class="log-meta-tag">📝 ${l.note}</span>` : ''}
+                </div>
+                <div class="log-item-date">${new Date(l.date).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'})}</div>
+              </div>
+              <button class="log-del-btn" onclick="delLog('${l.id}',this)">🗑️</button>
+            </div>`).join('')}
+        </div>`).join('');
+    }
+
+    async function delLog(id, btn) {
+      await fetch('/api/activity/nutrition/' + id, { method:'DELETE' });
+      btn.closest('.log-item').remove();
+    }
+
+    async function saveItem(type, id, btn) {
+      await fetch(`/api/save/${type}/${id}`, { method:'POST' });
+      btn.textContent = '✅ ذخیره شد'; btn.disabled = true;
+    }
+
+    async function deleteNut(id, btn) {
+      if (!confirm('حذف شود؟')) return;
+      await fetch('/api/nutrition/' + id, { method:'DELETE' });
+      btn.closest('.item-card').remove();
+    }
+
+    async function addNutrition() {
+      const title = document.getElementById('aTitle').value.trim();
+      if (!title) { alert('عنوان را وارد کنید'); return; }
+      const fd = new FormData();
+      fd.append('title', title);
+      fd.append('description', document.getElementById('aDesc').value);
+      fd.append('category', document.getElementById('aCat').value);
+      fd.append('content', document.getElementById('aContent').value);
+      const img = document.getElementById('aImg').files[0];
+      const vid = document.getElementById('aVid').files[0];
+      if (img) fd.append('image', img);
+      if (vid) fd.append('video', vid);
+      await fetch('/api/nutrition', { method:'POST', body:fd });
+      document.getElementById('aTitle').value = '';
+      document.getElementById('aDesc').value = '';
+      document.getElementById('aContent').value = '';
+      loadNutrition();
+      switchTab('plans', document.querySelector('.page-tab'));
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.page-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      btn.classList.add('active');
+      if (name === 'mylog') loadMyLog();
+    }
+  </script>
+</body>
+</html>

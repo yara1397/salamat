@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داشبورد — نانا</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <main class="dashboard-page">
+    <div class="container">
+      <div class="dash-header">
+        <h1>سلام، <span class="accent" id="username">...</span> 👋</h1>
+        <p>به داشبورد سلامتی خوش آمدید</p>
+      </div>
+      <div class="dash-grid">
+        <a href="/exercise.html" class="dash-card">
+          <div class="dash-card-icon">🏋️</div>
+          <div class="dash-card-info"><h3>آموزش ورزشی</h3><span id="exCount">در حال بارگذاری...</span></div>
+          <div class="dash-card-arrow">←</div>
+        </a>
+        <a href="/nutrition.html" class="dash-card">
+          <div class="dash-card-icon">🥗</div>
+          <div class="dash-card-info"><h3>تغذیه سالم</h3><span id="nutCount">در حال بارگذاری...</span></div>
+          <div class="dash-card-arrow">←</div>
+        </a>
+        <a href="/classes.html" class="dash-card">
+          <div class="dash-card-icon">📡</div>
+          <div class="dash-card-info"><h3>کلاس‌های آنلاین</h3><span id="clsCount">در حال بارگذاری...</span></div>
+          <div class="dash-card-arrow">←</div>
+        </a>
+        <a href="/profile.html" class="dash-card">
+          <div class="dash-card-icon">🗂️</div>
+          <div class="dash-card-info"><h3>موارد ذخیره شده</h3><span>پروفایل من</span></div>
+          <div class="dash-card-arrow">←</div>
+        </a>
+      </div>
+      <div id="liveSection"></div>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <script src="/js/shared.js"></script>
+  <script>
+    (async () => {
+      const user = await requireLogin();
+      if (!user) return;
+      injectLayout(user);
+      document.getElementById('username').textContent = user.username;
+
+      const [ex, nut, cls] = await Promise.all([
+        fetch('/api/exercises').then(r => r.json()),
+        fetch('/api/nutrition').then(r => r.json()),
+        fetch('/api/classes').then(r => r.json())
+      ]);
+
+      document.getElementById('exCount').textContent = ex.length + ' آموزش موجود';
+      document.getElementById('nutCount').textContent = nut.length + ' برنامه غذایی';
+      const live = cls.filter(c => c.isLive);
+      document.getElementById('clsCount').textContent = live.length + ' کلاس زنده';
+
+      if (live.length > 0) {
+        document.getElementById('liveSection').innerHTML = `
+          <div class="live-section">
+            <h2>🔴 کلاس‌های زنده الان</h2>
+            <div class="live-grid">
+              ${live.map(c => `
+                <div class="live-card">
+                  <div class="live-badge"><span class="pulse"></span> زنده</div>
+                  <h3>${c.title}</h3>
+                  <p>${c.description || ''}</p>
+                  <a href="/classroom.html?id=${c.id}" class="btn-join">ورود به کلاس</a>
+                </div>`).join('')}
+            </div>
+          </div>`;
+      }
+    })();
+  </script>
+</body>
+</html>
