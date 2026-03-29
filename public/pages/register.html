@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ثبت‌نام — نانا</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .input-icon-wrap { position:relative; }
+    .input-icon-wrap input { padding-right: 42px; }
+    .input-icon { position:absolute; right:13px; top:50%; transform:translateY(-50%); font-size:17px; pointer-events:none; }
+    .pw-strength { height:4px; border-radius:2px; margin-top:6px; transition:all .3s; }
+    .pw-strength.weak { background:#e74c3c; width:33%; }
+    .pw-strength.medium { background:#f39c12; width:66%; }
+    .pw-strength.strong { background:var(--green); width:100%; }
+    .pw-match { font-size:11px; margin-top:4px; }
+    .pw-match.ok { color:var(--green-light); }
+    .pw-match.no { color:#e74c3c; }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+  <main class="auth-page">
+    <div class="auth-container" style="max-width:460px">
+      <div class="auth-box">
+        <div class="auth-logo">🌿 نانا</div>
+        <h2>ثبت‌نام رایگان</h2>
+        <div id="errorMsg" class="alert-error" style="display:none"></div>
+        <div class="auth-form">
+
+          <!-- Username -->
+          <div class="form-group">
+            <label>نام کاربری *</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">👤</span>
+              <input type="text" id="username" placeholder="یک نام کاربری انتخاب کنید" autocomplete="username">
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label>ایمیل <span style="font-size:11px;color:var(--text2)">(اختیاری — برای دریافت اعلان‌ها)</span></label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">📧</span>
+              <input type="email" id="email" placeholder="example@email.com" autocomplete="email">
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="form-group">
+            <label>شماره موبایل <span style="font-size:11px;color:var(--text2)">(اختیاری)</span></label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">📱</span>
+              <input type="tel" id="phone" placeholder="09xxxxxxxxx" autocomplete="tel">
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label>رمز عبور *</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="password" placeholder="حداقل ۴ کاراکتر" autocomplete="new-password" oninput="checkStrength(this.value)">
+            </div>
+            <div class="pw-strength" id="pwStrength" style="display:none"></div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label>تکرار رمز عبور *</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="password2" placeholder="رمز را دوباره وارد کنید" autocomplete="new-password" oninput="checkMatch()" onkeydown="if(event.key==='Enter')doRegister()">
+            </div>
+            <div class="pw-match" id="pwMatch"></div>
+          </div>
+
+          <button onclick="doRegister()" class="btn-submit" id="regBtn">ثبت‌نام</button>
+        </div>
+        <p class="auth-switch">حساب دارید؟ <a href="/login.html">وارد شوید</a></p>
+      </div>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <script src="/js/shared.js"></script>
+  <script>
+    (async () => {
+      const user = await getUser();
+      if (user) { window.location.href = '/dashboard.html'; return; }
+      injectLayout(null);
+    })();
+
+    function checkStrength(pw) {
+      const bar = document.getElementById('pwStrength');
+      if (!pw) { bar.style.display='none'; return; }
+      bar.style.display = 'block';
+      bar.className = 'pw-strength';
+      if (pw.length < 4) bar.classList.add('weak');
+      else if (pw.length < 8) bar.classList.add('medium');
+      else bar.classList.add('strong');
+    }
+
+    function checkMatch() {
+      const pw  = document.getElementById('password').value;
+      const pw2 = document.getElementById('password2').value;
+      const el  = document.getElementById('pwMatch');
+      if (!pw2) { el.textContent = ''; return; }
+      if (pw === pw2) { el.textContent = '✅ رمزها یکسان هستند'; el.className = 'pw-match ok'; }
+      else            { el.textContent = '❌ رمزها یکسان نیستند'; el.className = 'pw-match no'; }
+    }
+
+    async function doRegister() {
+      const username  = document.getElementById('username').value.trim();
+      const email     = document.getElementById('email').value.trim();
+      const phone     = document.getElementById('phone').value.trim();
+      const password  = document.getElementById('password').value;
+      const password2 = document.getElementById('password2').value;
+      const err = document.getElementById('errorMsg');
+      const btn = document.getElementById('regBtn');
+
+      err.style.display = 'none';
+
+      if (!username || !password) {
+        err.textContent = 'نام کاربری و رمز الزامی است'; err.style.display = 'block'; return;
+      }
+      if (password !== password2) {
+        err.textContent = 'رمز عبور با تکرارش یکسان نیست'; err.style.display = 'block'; return;
+      }
+      if (password.length < 4) {
+        err.textContent = 'رمز باید حداقل ۴ کاراکتر باشد'; err.style.display = 'block'; return;
+      }
+
+      btn.textContent = 'در حال ثبت‌نام...'; btn.disabled = true;
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, phone, password, password2 })
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.href = '/dashboard.html';
+      } else {
+        err.textContent = data.error; err.style.display = 'block';
+        btn.textContent = 'ثبت‌نام'; btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

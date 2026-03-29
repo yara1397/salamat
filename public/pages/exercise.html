@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>آموزش ورزشی — نانا</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    .page-tabs { display:flex; gap:8px; margin-bottom:28px; border-bottom:1px solid var(--border); padding-bottom:16px; }
+    .page-tab { background:none; border:none; color:var(--text2); font-family:'Vazirmatn',sans-serif; font-size:15px; font-weight:600; padding:10px 20px; border-radius:10px; cursor:pointer; transition:all .2s; }
+    .page-tab.active { background:var(--green); color:white; }
+    .page-tab:hover:not(.active) { background:var(--bg3); color:var(--text); }
+    .tab-section { display:none; }
+    .tab-section.active { display:block; }
+
+    /* Log form */
+    .log-form-card { background:var(--card); border:1px solid var(--green); border-radius:14px; padding:22px; margin-bottom:28px; }
+    .log-form-card h3 { font-size:16px; margin-bottom:16px; color:var(--green-light); }
+    .form-inline { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:12px; }
+    .log-input { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:10px 14px; border-radius:9px; font-family:'Vazirmatn',sans-serif; font-size:14px; outline:none; width:100%; }
+    .log-input:focus { border-color:var(--green); }
+    .log-btn { background:var(--green); color:white; border:none; border-radius:9px; padding:10px 22px; font-family:'Vazirmatn',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:background .2s; }
+    .log-btn:hover { background:var(--green-light); }
+
+    /* Logs table */
+    .logs-list { display:flex; flex-direction:column; gap:10px; }
+    .log-item { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 18px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .log-item:hover { border-color:var(--green); }
+    .log-item-info { flex:1; }
+    .log-item-title { font-size:15px; font-weight:700; margin-bottom:4px; color:var(--green-light); }
+    .log-item-meta { display:flex; flex-wrap:wrap; gap:10px; font-size:13px; color:var(--text2); }
+    .log-meta-tag { background:var(--bg3); border-radius:6px; padding:2px 10px; }
+    .log-item-date { font-size:12px; color:var(--text2); margin-top:6px; }
+    .log-del-btn { background:rgba(220,50,50,.12); color:#ff6b6b; border:1px solid rgba(220,50,50,.25); border-radius:8px; padding:6px 10px; cursor:pointer; font-size:13px; flex-shrink:0; }
+
+    /* Exercise card log button */
+    .btn-log { background:rgba(45,158,107,.2); color:var(--green-light); border:1px solid rgba(45,158,107,.3); padding:7px 14px; border-radius:8px; font-family:'Vazirmatn',sans-serif; font-size:13px; cursor:pointer; transition:all .2s; }
+    .btn-log:hover { background:var(--green); color:white; }
+
+    /* quick log modal */
+    .qlog-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); z-index:500; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .qlog-overlay.hidden { display:none; }
+    .qlog-box { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:26px; width:100%; max-width:440px; }
+    .qlog-box h3 { font-size:17px; margin-bottom:18px; }
+    .qlog-close { float:left; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text2); }
+    .empty-logs { text-align:center; padding:40px; color:var(--text2); font-size:14px; }
+  </style>
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <!-- Quick Log Modal -->
+  <div class="qlog-overlay hidden" id="qlogOverlay">
+    <div class="qlog-box">
+      <button class="qlog-close" onclick="closeQLog()">✕</button>
+      <h3>📝 ثبت فعالیت: <span id="qlogTitle" style="color:var(--green-light)"></span></h3>
+      <input type="hidden" id="qlogId">
+      <div class="form-inline">
+        <div><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">ست</label>
+          <input class="log-input" id="qlogSets" placeholder="مثلاً: ۳"></div>
+        <div><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">تکرار</label>
+          <input class="log-input" id="qlogReps" placeholder="مثلاً: ۱۲"></div>
+        <div><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">مدت (دقیقه)</label>
+          <input class="log-input" id="qlogDur" placeholder="مثلاً: ۳۰"></div>
+      </div>
+      <div style="margin-top:10px">
+        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">یادداشت</label>
+        <input class="log-input" id="qlogNote" placeholder="احساس خود را بنویسید...">
+      </div>
+      <button onclick="submitQLog()" class="log-btn" style="margin-top:16px;width:100%">✅ ثبت فعالیت</button>
+    </div>
+  </div>
+
+  <main class="content-page">
+    <div class="container">
+      <div class="page-header">
+        <h1>🏋️ ورزش و تندرستی</h1>
+        <p>برنامه ورزشی + ثبت فعالیت روزانه</p>
+      </div>
+
+      <div class="page-tabs">
+        <button class="page-tab active" onclick="switchTab('programs',this)">📋 برنامه‌های ورزشی</button>
+        <button class="page-tab" onclick="switchTab('mylog',this)">📊 گزارش من</button>
+        <div id="adminTabBtn" style="display:none">
+          <button class="page-tab" onclick="switchTab('add',this)">➕ افزودن آموزش</button>
+        </div>
+      </div>
+
+      <!-- Tab: Programs -->
+      <div class="tab-section active" id="tab-programs">
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="filterEx('all',this)">همه</button>
+          <button class="filter-tab" onclick="filterEx('upper',this)">بالا تنه</button>
+          <button class="filter-tab" onclick="filterEx('lower',this)">پایین تنه</button>
+          <button class="filter-tab" onclick="filterEx('cardio',this)">کاردیو</button>
+          <button class="filter-tab" onclick="filterEx('flexibility',this)">انعطاف</button>
+          <button class="filter-tab" onclick="filterEx('full',this)">تمام بدن</button>
+        </div>
+        <div class="items-grid" id="exGrid">
+          <div class="empty-state"><span>⏳</span><p>در حال بارگذاری...</p></div>
+        </div>
+      </div>
+
+      <!-- Tab: My Log -->
+      <div class="tab-section" id="tab-mylog">
+        <div class="log-form-card">
+          <h3>➕ ثبت فعالیت جدید</h3>
+          <div class="form-inline">
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">نام تمرین *</label>
+              <input class="log-input" id="logTitle" placeholder="مثلاً: پرس سینه">
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">ست</label>
+              <input class="log-input" id="logSets" placeholder="مثلاً: ۳">
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">تکرار</label>
+              <input class="log-input" id="logReps" placeholder="مثلاً: ۱۲">
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">مدت (دقیقه)</label>
+              <input class="log-input" id="logDur" placeholder="مثلاً: ۳۰">
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">یادداشت</label>
+            <input class="log-input" id="logNote" placeholder="احساس خود را بنویسید...">
+          </div>
+          <button onclick="addLog()" class="log-btn">✅ ثبت فعالیت</button>
+        </div>
+
+        <h3 style="font-size:17px;margin-bottom:16px">📊 تاریخچه فعالیت‌های من</h3>
+        <div id="myLogList" class="logs-list">
+          <div class="empty-logs">⏳ در حال بارگذاری...</div>
+        </div>
+      </div>
+
+      <!-- Tab: Add (Admin) -->
+      <div class="tab-section" id="tab-add">
+        <div class="log-form-card">
+          <h3>➕ افزودن آموزش ورزشی جدید</h3>
+          <div class="form-inline">
+            <div style="grid-column:1/-1">
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">عنوان *</label>
+              <input class="log-input" id="aTitle">
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">دسته‌بندی</label>
+              <select class="log-input" id="aCat">
+                <option value="upper">بالا تنه</option>
+                <option value="lower">پایین تنه</option>
+                <option value="cardio">کاردیو</option>
+                <option value="flexibility">انعطاف</option>
+                <option value="full">تمام بدن</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin:10px 0">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">توضیحات</label>
+            <textarea class="log-input" id="aDesc" rows="3"></textarea>
+          </div>
+          <div class="form-inline">
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">تصویر</label>
+              <input type="file" class="log-input" id="aImg" accept="image/*">
+            </div>
+            <div>
+              <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:4px">ویدیو</label>
+              <input type="file" class="log-input" id="aVid" accept="video/*">
+            </div>
+          </div>
+          <button onclick="addExercise()" class="log-btn" style="margin-top:14px">💾 ذخیره آموزش</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer"></div>
+  <script src="/js/shared.js"></script>
+  <script>
+    let currentUser = null;
+    let allExercises = [];
+    let currentFilter = 'all';
+
+    (async () => {
+      currentUser = await requireLogin();
+      if (!currentUser) return;
+      injectLayout(currentUser);
+      if (currentUser.role === 'admin') document.getElementById('adminTabBtn').style.display = 'block';
+      loadExercises();
+      loadMyLog();
+    })();
+
+    async function loadExercises() {
+      const res = await fetch('/api/exercises');
+      allExercises = await res.json();
+      renderExercises();
+    }
+
+    function renderExercises() {
+      const catMap = { upper:'بالا تنه', lower:'پایین تنه', cardio:'کاردیو', flexibility:'انعطاف', full:'تمام بدن' };
+      const data = currentFilter === 'all' ? allExercises : allExercises.filter(e => e.category === currentFilter);
+      const grid = document.getElementById('exGrid');
+      if (data.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><span>🏋️</span><p>آموزشی یافت نشد</p></div>';
+        return;
+      }
+      grid.innerHTML = data.map(ex => `
+        <div class="item-card">
+          ${ex.image ? `<div class="item-media"><img src="${ex.image}" alt="${ex.title}" loading="lazy"></div>` : '<div class="item-media no-media">🏋️</div>'}
+          <div class="item-body">
+            <div class="item-category">${catMap[ex.category] || ex.category}</div>
+            <h3>${ex.title}</h3>
+            <p>${ex.description || ''}</p>
+            ${ex.video ? `<video controls class="item-video"><source src="${ex.video}"></video>` : ''}
+            <div class="item-actions">
+              <button class="btn-log" onclick="openQLog('${ex.id}','${ex.title.replace(/'/g,"\\'")}')">📝 ثبت انجام دادم</button>
+              <button class="btn-save" onclick="saveItem('exercise','${ex.id}',this)">🗂️ ذخیره</button>
+              ${currentUser.role === 'admin' ? `<button class="btn-delete" onclick="deleteEx('${ex.id}',this)">🗑️</button>` : ''}
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    function filterEx(cat, btn) {
+      currentFilter = cat;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderExercises();
+    }
+
+    // Quick log from exercise card
+    function openQLog(id, title) {
+      document.getElementById('qlogId').value = id;
+      document.getElementById('qlogTitle').textContent = title;
+      document.getElementById('qlogSets').value = '';
+      document.getElementById('qlogReps').value = '';
+      document.getElementById('qlogDur').value = '';
+      document.getElementById('qlogNote').value = '';
+      document.getElementById('qlogOverlay').classList.remove('hidden');
+    }
+    function closeQLog() { document.getElementById('qlogOverlay').classList.add('hidden'); }
+    document.getElementById('qlogOverlay').addEventListener('click', e => { if (e.target.id === 'qlogOverlay') closeQLog(); });
+
+    async function submitQLog() {
+      const id = document.getElementById('qlogId').value;
+      const title = document.getElementById('qlogTitle').textContent;
+      const body = {
+        exerciseId: id, exerciseTitle: title,
+        sets: document.getElementById('qlogSets').value,
+        reps: document.getElementById('qlogReps').value,
+        duration: document.getElementById('qlogDur').value,
+        note: document.getElementById('qlogNote').value
+      };
+      await fetch('/api/activity/exercise', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      closeQLog();
+      loadMyLog();
+      // show feedback
+      const btn = document.querySelector(`.btn-log[onclick*="${id}"]`);
+      if (btn) { btn.textContent = '✅ ثبت شد!'; setTimeout(() => btn.textContent = '📝 ثبت انجام دادم', 2000); }
+    }
+
+    // Manual log
+    async function addLog() {
+      const title = document.getElementById('logTitle').value.trim();
+      if (!title) { alert('نام تمرین را وارد کنید'); return; }
+      const body = {
+        exerciseTitle: title,
+        sets: document.getElementById('logSets').value,
+        reps: document.getElementById('logReps').value,
+        duration: document.getElementById('logDur').value,
+        note: document.getElementById('logNote').value
+      };
+      await fetch('/api/activity/exercise', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+      document.getElementById('logTitle').value = '';
+      document.getElementById('logSets').value = '';
+      document.getElementById('logReps').value = '';
+      document.getElementById('logDur').value = '';
+      document.getElementById('logNote').value = '';
+      loadMyLog();
+    }
+
+    async function loadMyLog() {
+      const logs = await fetch('/api/activity/exercise').then(r => r.json());
+      const container = document.getElementById('myLogList');
+      if (logs.length === 0) {
+        container.innerHTML = '<div class="empty-logs">📋 هنوز فعالیتی ثبت نکرده‌اید<br><small>از دکمه «ثبت انجام دادم» روی هر تمرین استفاده کنید</small></div>';
+        return;
+      }
+      container.innerHTML = logs.map(l => `
+        <div class="log-item">
+          <div class="log-item-info">
+            <div class="log-item-title">🏋️ ${l.exerciseTitle}</div>
+            <div class="log-item-meta">
+              ${l.sets ? `<span class="log-meta-tag">ست: ${l.sets}</span>` : ''}
+              ${l.reps ? `<span class="log-meta-tag">تکرار: ${l.reps}</span>` : ''}
+              ${l.duration ? `<span class="log-meta-tag">⏱ ${l.duration} دقیقه</span>` : ''}
+              ${l.note ? `<span class="log-meta-tag">📝 ${l.note}</span>` : ''}
+            </div>
+            <div class="log-item-date">${new Date(l.date).toLocaleString('fa-IR')}</div>
+          </div>
+          <button class="log-del-btn" onclick="delLog('${l.id}',this)">🗑️</button>
+        </div>`).join('');
+    }
+
+    async function delLog(id, btn) {
+      await fetch('/api/activity/exercise/' + id, { method:'DELETE' });
+      btn.closest('.log-item').remove();
+    }
+
+    async function saveItem(type, id, btn) {
+      await fetch(`/api/save/${type}/${id}`, { method:'POST' });
+      btn.textContent = '✅ ذخیره شد'; btn.disabled = true;
+    }
+
+    async function deleteEx(id, btn) {
+      if (!confirm('حذف شود؟')) return;
+      await fetch('/api/exercises/' + id, { method:'DELETE' });
+      btn.closest('.item-card').remove();
+    }
+
+    async function addExercise() {
+      const title = document.getElementById('aTitle').value.trim();
+      if (!title) { alert('عنوان را وارد کنید'); return; }
+      const fd = new FormData();
+      fd.append('title', title);
+      fd.append('description', document.getElementById('aDesc').value);
+      fd.append('category', document.getElementById('aCat').value);
+      const img = document.getElementById('aImg').files[0];
+      const vid = document.getElementById('aVid').files[0];
+      if (img) fd.append('image', img);
+      if (vid) fd.append('video', vid);
+      await fetch('/api/exercises', { method:'POST', body:fd });
+      document.getElementById('aTitle').value = '';
+      document.getElementById('aDesc').value = '';
+      loadExercises();
+      switchTab('programs', document.querySelector('.page-tab'));
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.page-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      btn.classList.add('active');
+      if (name === 'mylog') loadMyLog();
+    }
+  </script>
+</body>
+</html>

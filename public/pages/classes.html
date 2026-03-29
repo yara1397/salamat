@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>کلاس‌های آنلاین — نانا</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <main class="content-page">
+    <div class="container">
+      <div class="page-header">
+        <h1>📡 کلاس‌های آنلاین</h1>
+        <p>کلاس‌های زنده با مربی</p>
+      </div>
+
+      <div id="adminSection" style="display:none" class="admin-add-section">
+        <button class="btn-add" onclick="toggleForm()">+ ساخت کلاس جدید</button>
+        <div id="addForm" class="add-form hidden">
+          <h3>کلاس جدید</h3>
+          <div class="form-group"><label>عنوان کلاس</label><input type="text" id="cTitle"></div>
+          <div class="form-group"><label>توضیحات</label><textarea id="cDesc" rows="2"></textarea></div>
+          <button onclick="createClass()" class="btn-submit">شروع کلاس</button>
+          <button onclick="toggleForm()" class="btn-cancel">لغو</button>
+        </div>
+      </div>
+
+      <div class="classes-section">
+        <h2>🔴 کلاس‌های زنده</h2>
+        <div class="items-grid" id="liveGrid">
+          <div class="empty-state"><span>⏳</span><p>در حال بارگذاری...</p></div>
+        </div>
+      </div>
+
+      <div class="classes-section">
+        <h2>📚 کلاس‌های قبلی</h2>
+        <div class="items-grid" id="pastGrid">
+          <div class="empty-state"><span>📚</span><p>در حال بارگذاری...</p></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer"></div>
+  <script src="/js/shared.js"></script>
+  <script>
+    let currentUser = null;
+
+    (async () => {
+      currentUser = await requireLogin();
+      if (!currentUser) return;
+      injectLayout(currentUser);
+      if (currentUser.role === 'admin') document.getElementById('adminSection').style.display = 'block';
+      loadClasses();
+    })();
+
+    async function loadClasses() {
+      const classes = await fetch('/api/classes').then(r => r.json());
+      const live = classes.filter(c => c.isLive);
+      const past = classes.filter(c => !c.isLive);
+
+      const liveGrid = document.getElementById('liveGrid');
+      liveGrid.innerHTML = live.length === 0
+        ? '<div class="empty-state"><span>📡</span><p>در حال حاضر کلاس زنده‌ای وجود ندارد</p></div>'
+        : live.map(c => `
+          <div class="class-card live">
+            <div class="live-indicator"><span class="pulse"></span> زنده</div>
+            <h3>${c.title}</h3>
+            <p>${c.description || ''}</p>
+            <div class="class-meta">🎓 مربی: ${c.creatorName}</div>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+              <a href="/classroom.html?id=${c.id}" class="btn-join">ورود به کلاس</a>
+              ${currentUser.role === 'admin' ? `<button class="btn-end-class" onclick="endClass('${c.id}')">⛔ پایان کلاس</button>` : ''}
+            </div>
+          </div>`).join('');
+
+      const pastGrid = document.getElementById('pastGrid');
+      pastGrid.innerHTML = past.length === 0
+        ? '<div class="empty-state"><span>📚</span><p>کلاس قبلی‌ای وجود ندارد</p></div>'
+        : past.map(c => `
+          <div class="class-card past">
+            <div class="past-badge">پایان یافته</div>
+            <h3>${c.title}</h3>
+            <p>${c.description || ''}</p>
+            <div class="class-meta">🎓 مربی: ${c.creatorName}</div>
+          </div>`).join('');
+    }
+
+    function toggleForm() { document.getElementById('addForm').classList.toggle('hidden'); }
+
+    async function createClass() {
+      const title = document.getElementById('cTitle').value.trim();
+      const description = document.getElementById('cDesc').value.trim();
+      if (!title) { alert('عنوان کلاس را وارد کنید'); return; }
+      const res = await fetch('/api/classes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, description }) });
+      const data = await res.json();
+      if (data.success) window.location.href = '/classroom.html?id=' + data.cls.id;
+    }
+
+    async function endClass(id) {
+      if (!confirm('کلاس پایان یابد؟')) return;
+      await fetch('/api/classes/' + id + '/end', { method: 'POST' });
+      loadClasses();
+    }
+  </script>
+</body>
+</html>

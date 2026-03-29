@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نانا — سلامت و تندرستی</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+  <div id="navbar"></div>
+
+  <main>
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <span class="hero-badge">سلامت · تندرستی · زندگی بهتر</span>
+        <h1 class="hero-title">سلامت واقعی<br><span class="accent">از اینجا شروع می‌شه</span></h1>
+        <p class="hero-desc">برنامه ورزشی، رژیم غذایی سالم و کلاس‌های آنلاین زنده — همه در یک جا</p>
+        <div class="hero-actions" id="heroActions">
+          <a href="/register.html" class="btn-hero-primary">شروع رایگان</a>
+          <a href="/login.html" class="btn-hero-secondary">ورود به حساب</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="floating-card card-1">💪 ورزش روزانه</div>
+        <div class="floating-card card-2">🥗 تغذیه سالم</div>
+        <div class="floating-card card-3">🎓 کلاس زنده</div>
+        <div class="hero-circle"></div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="container">
+        <h2 class="section-title">امکانات نانا</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🏋️</div>
+            <h3>آموزش ورزشی</h3>
+            <p>روتین‌های ورزشی با تصویر و ویدیو آموزشی برای همه سطوح</p>
+            <a href="/exercise.html" class="feature-link">مشاهده →</a>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🥑</div>
+            <h3>تغذیه سالم</h3>
+            <p>رژیم غذایی مناسب، دستور پخت و راهنمای جامع تغذیه</p>
+            <a href="/nutrition.html" class="feature-link">مشاهده →</a>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">📡</div>
+            <h3>کلاس آنلاین</h3>
+            <p>کلاس‌های زنده با مربی، چت گروهی و مدیریت کامل</p>
+            <a href="/classes.html" class="feature-link">مشاهده →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item"><span class="stat-num">+۵۰</span><span class="stat-label">آموزش ورزشی</span></div>
+          <div class="stat-item"><span class="stat-num">+۳۰</span><span class="stat-label">رژیم غذایی</span></div>
+          <div class="stat-item"><span class="stat-num">۲۴/۷</span><span class="stat-label">کلاس آنلاین</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer"></div>
+
+  <script src="/js/shared.js"></script>
+  <script>
+    (async () => {
+      const user = await getUser();
+      injectLayout(user);
+      if (user) {
+        document.getElementById('heroActions').innerHTML = `
+          <a href="/dashboard.html" class="btn-hero-primary">ورود به داشبورد</a>`;
+      }
+    })();
+  </script>
+</body>
+</html>
