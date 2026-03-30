@@ -308,7 +308,7 @@
     <div class="panel" id="p-classes">
       <div class="p-header">
         <h2 class="p-title">کلاس‌های <span>آنلاین</span></h2>
-        <button onclick="openCreateClass()" class="btn-p">+ کلاس جدید</button>
+        <button onclick="openCreateClass()" class="btn-p">+ ساخت کلاس جدید</button>
       </div>
       <div class="sec">
         <div class="sec-head"><h3>🔴 کلاس‌های زنده</h3></div>
@@ -626,7 +626,13 @@ async function submitClass() {
   const title = document.getElementById('cTitle').value.trim();
   if (!title) { alert('عنوان را وارد کنید'); return; }
   const r = await fetch('/api/classes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,description:document.getElementById('cDesc').value})}).then(x=>x.json());
-  if (r.success) { closeModal(); window.location.href = '/classroom.html?id='+r.cls.id; }
+  if (r.success) { 
+    closeModal(); 
+    toast('کلاس ساخته شد ✅');
+    loadAll();
+    // Open classroom in new tab
+    window.open('/classroom.html?id='+r.cls.id, '_blank');
+  }
 }
 
 // ─── Add/Edit Exercise ───
