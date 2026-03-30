@@ -1,187 +1,16 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>چت — نانا</title>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
-  <style>
-    .chat-page { height: calc(100vh - 66px); display: flex; flex-direction: column; overflow: hidden; }
-
-    .chat-layout {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 270px 1fr;
-      overflow: hidden;
-    }
-
-    /* ── Sidebar ── */
-    .chat-sidebar {
-      background: var(--bg2);
-      border-left: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .sidebar-head {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .sidebar-head h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
-    .tab-row { display: flex; gap: 6px; }
-    .stab {
-      flex: 1; padding: 8px; border-radius: 8px;
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text2); font-family: 'Vazirmatn', sans-serif;
-      font-size: 13px; cursor: pointer; transition: all .15s;
-    }
-    .stab.active { background: var(--green); border-color: var(--green); color: white; }
-
-    /* Mobile toggle button */
-    .mobile-sidebar-toggle {
-      display: none;
-      background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text); padding: 8px 14px; border-radius: 8px;
-      font-family: 'Vazirmatn', sans-serif; font-size: 13px; cursor: pointer;
-    }
-
-    .online-list { flex: 1; overflow-y: auto; padding: 8px; }
-    .online-head {
-      font-size: 11px; color: var(--text2); padding: 6px 8px 4px;
-      font-weight: 700; letter-spacing: .5px; display: flex;
-      align-items: center; justify-content: space-between;
-    }
-    .online-count { background: var(--bg3); border-radius: 10px; padding: 1px 7px; font-size: 10px; }
-    .online-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 10px; border-radius: 9px;
-      cursor: pointer; transition: background .15s;
-    }
-    .online-item:hover { background: var(--bg3); }
-    .online-item.selected { background: rgba(45,158,107,.15); }
-    .online-dot { width: 8px; height: 8px; border-radius: 50%; background: #4dff9a; flex-shrink: 0; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
-    .online-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--green); color: white;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; font-weight: 700; flex-shrink: 0;
-    }
-    .online-name { font-size: 13px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .unread-badge {
-      background: var(--green); color: white;
-      border-radius: 10px; padding: 1px 7px; font-size: 11px; font-weight: 700; flex-shrink: 0;
-    }
-
-    /* ── Main chat ── */
-    .chat-main { display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
-
-    .chat-topbar {
-      padding: 11px 16px;
-      background: var(--bg2); border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
-    }
-    .chat-topbar-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--green); color: white;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 15px; flex-shrink: 0;
-    }
-    .chat-topbar-info h4 { font-size: 14px; font-weight: 700; margin: 0; }
-    .chat-topbar-info span { font-size: 11px; color: var(--text2); }
-    .chat-topbar-badge {
-      margin-right: auto; flex-shrink: 0;
-      padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;
-    }
-    .badge-public { background: rgba(45,158,107,.15); color: var(--green-light); border: 1px solid rgba(45,158,107,.25); }
-    .badge-private { background: rgba(244,167,38,.12); color: var(--accent); border: 1px solid rgba(244,167,38,.25); }
-
-    .messages-area {
-      flex: 1; overflow-y: auto; padding: 14px;
-      display: flex; flex-direction: column; gap: 8px;
-      scroll-behavior: smooth;
-    }
-
-    /* Messages */
-    .msg-bubble { max-width: 75%; display: flex; flex-direction: column; gap: 2px; }
-    .msg-bubble.mine { align-self: flex-end; align-items: flex-end; }
-    .msg-bubble.theirs { align-self: flex-start; align-items: flex-start; }
-    .msg-sender { font-size: 11px; color: var(--text2); padding: 0 4px; font-weight: 600; }
-    .msg-body {
-      padding: 9px 13px; border-radius: 14px;
-      font-size: 14px; line-height: 1.5; word-break: break-word;
-    }
-    .mine .msg-body { background: var(--green); color: white; border-bottom-left-radius: 4px; }
-    .theirs .msg-body { background: var(--card); border: 1px solid var(--border); border-bottom-right-radius: 4px; }
-    .msg-body.private-msg { background: rgba(244,167,38,.15) !important; border: 1px solid rgba(244,167,38,.3) !important; color: var(--text) !important; }
-    .msg-time { font-size: 10px; color: var(--text2); padding: 0 4px; }
-    .msg-sys { text-align: center; font-size: 11px; color: var(--text2); font-style: italic; padding: 2px 0; }
-    .private-label { font-size: 11px; color: var(--accent); padding: 1px 8px; background: rgba(244,167,38,.1); border-radius: 8px; margin-bottom: 2px; }
-
-    /* Scroll btn */
-    .scroll-to-bottom {
-      position: sticky; bottom: 8px; align-self: center;
-      background: var(--green); color: white; border: none;
-      border-radius: 20px; padding: 5px 16px;
-      font-family: 'Vazirmatn', sans-serif; font-size: 12px;
-      cursor: pointer; display: none; z-index: 5;
-    }
-
-    /* Input */
-    .chat-input-area {
-      padding: 10px 14px; border-top: 1px solid var(--border);
-      flex-shrink: 0; background: var(--bg2);
-    }
-    .input-row { display: flex; gap: 8px; align-items: flex-end; }
-    .msg-input {
-      flex: 1; background: var(--bg3); border: 1px solid var(--border);
-      color: var(--text); border-radius: 12px; padding: 10px 14px;
-      font-family: 'Vazirmatn', sans-serif; font-size: 14px;
-      outline: none; resize: none; max-height: 100px; min-height: 42px; line-height: 1.5;
-    }
-    .msg-input:focus { border-color: var(--green); }
-    .send-btn {
-      background: var(--green); color: white; border: none;
-      border-radius: 10px; width: 42px; height: 42px; flex-shrink: 0;
-      cursor: pointer; font-size: 18px; display: flex;
-      align-items: center; justify-content: center; transition: background .2s;
-    }
-    .send-btn:hover { background: var(--green-light); }
-
-    .empty-chat {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      color: var(--text2); gap: 12px; pointer-events: none;
-    }
-    .empty-chat span { font-size: 40px; }
-
-    /* ── Mobile Responsive ── */
-    @media (max-width: 768px) {
-      .chat-layout { grid-template-columns: 1fr; }
-      .chat-sidebar {
-        position: fixed; inset: 0; z-index: 200;
-        transform: translateX(100%);
-        transition: transform .25s ease;
-        width: 85%; max-width: 300px;
-        right: 0; left: auto;
-        top: 66px; height: calc(100vh - 66px);
-      }
-      .chat-sidebar.open { transform: translateX(0); }
-      .mobile-sidebar-toggle { display: flex; align-items: center; gap: 6px; }
-      .sidebar-overlay {
-        display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
-        z-index: 199;
-      }
-      .sidebar-overlay.show { display: block; }
-    }
-  </style>
 </head>
 <body>
   <div id="navbar"></div>
 
   <div class="chat-page">
-    <!-- Mobile overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
     <div class="chat-layout">
@@ -196,24 +25,19 @@
         </div>
         <div class="online-list">
           <div class="online-head">
-            <span>👥 کاربران آنلاین</span>
+            <span>👥 آنلاین</span>
             <span class="online-count" id="onlineCount">0</span>
           </div>
-          <div id="onlineList">
-            <div style="padding:20px;text-align:center;color:var(--text2);font-size:13px">در حال بارگذاری...</div>
-          </div>
-          <div class="online-head" style="margin-top:12px">
-            <span>💬 مکالمات خصوصی</span>
-          </div>
+          <div id="onlineList"><div style="padding:16px;text-align:center;color:var(--text2);font-size:12px">در حال بارگذاری...</div></div>
+          <div class="online-head" style="margin-top:10px"><span>💬 خصوصی</span></div>
           <div id="privateConvs"></div>
         </div>
       </aside>
 
-      <!-- Chat Main -->
+      <!-- Main -->
       <div class="chat-main">
         <div class="chat-topbar">
-          <!-- Mobile toggle -->
-          <button class="mobile-sidebar-toggle" onclick="openSidebar()">👥</button>
+          <button class="mobile-sidebar-toggle" onclick="openSidebar()">👥 کاربران</button>
           <div class="chat-topbar-avatar" id="topbarAvatar">🌐</div>
           <div class="chat-topbar-info">
             <h4 id="topbarName">چت عمومی</h4>
@@ -223,7 +47,7 @@
         </div>
 
         <div class="messages-area" id="messagesArea">
-          <button class="scroll-to-bottom" id="scrollBtn" onclick="scrollBottom()">↓ پیام جدید</button>
+          <button class="scroll-to-bottom" id="scrollBtn" onclick="scrollBottom()">↓ جدید</button>
           <div class="empty-chat" id="emptyChat">
             <span>💬</span>
             <p>در حال اتصال...</p>
@@ -233,7 +57,7 @@
         <div class="chat-input-area">
           <div class="input-row">
             <textarea class="msg-input" id="msgInput" rows="1"
-              placeholder="پیام بنویسید... (Enter = ارسال، Shift+Enter = خط جدید)"
+              placeholder="پیام بنویسید... (Enter = ارسال)"
               onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
             <button class="send-btn" onclick="sendMessage()">➤</button>
           </div>
@@ -245,21 +69,17 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/shared.js"></script>
   <script>
-    let me = null;
-    let socket = null;
-    let mode = 'public';
-    let privateTarget = null;
-    let unreadCounts = {};
-    let scrolledUp = false;
+    let me = null, socket = null;
+    let mode = 'public', privateTarget = null;
+    let unreadCounts = {}, scrolledUp = false;
 
     const messagesArea = document.getElementById('messagesArea');
     const scrollBtn = document.getElementById('scrollBtn');
 
     messagesArea.addEventListener('scroll', () => {
-      const atBottom = messagesArea.scrollHeight - messagesArea.scrollTop - messagesArea.clientHeight < 60;
+      const atBottom = messagesArea.scrollHeight - messagesArea.scrollTop - messagesArea.clientHeight < 80;
       scrolledUp = !atBottom;
-      scrollBtn.style.display = scrolledUp ? 'none' : 'none';
-      if (!scrolledUp) scrollBtn.style.display = 'none';
+      scrollBtn.style.display = (!atBottom) ? 'inline-block' : 'none';
     });
 
     function scrollBottom() {
@@ -269,10 +89,9 @@
     }
     function autoScroll() {
       if (!scrolledUp) { messagesArea.scrollTop = messagesArea.scrollHeight; }
-      else { scrollBtn.style.display = 'inline-block'; }
+      else scrollBtn.style.display = 'inline-block';
     }
 
-    // Mobile sidebar
     function openSidebar() {
       document.getElementById('chatSidebar').classList.add('open');
       document.getElementById('sidebarOverlay').classList.add('show');
@@ -290,49 +109,26 @@
     })();
 
     function initSocket() {
-      socket = io();
-
-      socket.on('connect', () => {
-        socket.emit('chat:join');
-        socket.emit('chat:getPublic');
-      });
-
-      socket.on('chat:users', users => {
-        renderOnlineList(users.filter(u => u.userId !== me.id));
-      });
-
-      socket.on('chat:public', msg => {
-        if (mode === 'public') { appendMsg(msg, false); autoScroll(); }
-      });
-
+      socket = io({ transports: ['websocket', 'polling'] });
+      socket.on('connect', () => { socket.emit('chat:join'); socket.emit('chat:getPublic'); });
+      socket.on('chat:users', users => renderOnlineList(users.filter(u => u.userId !== me.id)));
+      socket.on('chat:public', msg => { if (mode === 'public') { appendMsg(msg, false); autoScroll(); } });
       socket.on('chat:private', msg => {
         const otherId = msg.userId === me.id ? msg.toUserId : msg.userId;
         const otherName = msg.userId === me.id ? (msg.toUsername || '') : msg.username;
-        if (mode === 'private' && privateTarget?.userId === otherId) {
-          appendMsg(msg, true); autoScroll();
-        } else {
-          unreadCounts[otherId] = (unreadCounts[otherId] || 0) + 1;
-          updatePrivateConvEntry(otherId, otherName, msg.message);
-        }
+        if (mode === 'private' && privateTarget?.userId === otherId) { appendMsg(msg, true); autoScroll(); }
+        else { unreadCounts[otherId] = (unreadCounts[otherId] || 0) + 1; updatePrivateConvEntry(otherId, otherName, msg.message); renderOnlineList(currentOnlineList); }
       });
-
-      socket.on('chat:history:public', msgs => {
-        clearMessages();
-        msgs.forEach(m => appendMsg(m, false));
-        scrollBottom();
-      });
-
+      socket.on('chat:history:public', msgs => { clearMessages(); msgs.forEach(m => appendMsg(m, false)); scrollBottom(); });
       socket.on('chat:history:private', ({ withUserId, msgs }) => {
         if (privateTarget?.userId !== withUserId) return;
-        clearMessages();
-        msgs.forEach(m => appendMsg(m, true));
-        scrollBottom();
+        clearMessages(); msgs.forEach(m => appendMsg(m, true)); scrollBottom();
       });
-
       socket.on('chat:userJoined', ({ username }) => appendSys('🟢 ' + username + ' آنلاین شد'));
       socket.on('chat:userLeft', ({ username }) => appendSys('⚫ ' + username + ' آفلاین شد'));
     }
 
+    let currentOnlineList = [];
     function switchMode(m) {
       mode = m;
       document.getElementById('tabPublic').classList.toggle('active', m === 'public');
@@ -347,11 +143,10 @@
     }
 
     function selectPrivate(userId, username) {
-      mode = 'private';
-      privateTarget = { userId, username };
+      mode = 'private'; privateTarget = { userId, username };
       document.getElementById('tabPublic').classList.remove('active');
       document.getElementById('tabPrivate').classList.add('active');
-      updateTopbar(username.charAt(0).toUpperCase(), username, 'پیام خصوصی — فقط شما دو نفر', false);
+      updateTopbar(username.charAt(0).toUpperCase(), username, 'پیام خصوصی', false);
       clearMessages();
       unreadCounts[userId] = 0;
       updatePrivateConvEntry(userId, username);
@@ -372,14 +167,15 @@
     }
 
     function renderOnlineList(users) {
+      currentOnlineList = users;
       document.getElementById('onlineCount').textContent = users.length;
       const list = document.getElementById('onlineList');
       if (users.length === 0) {
-        list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text2);font-size:13px">هیچ کاربری آنلاین نیست</div>';
+        list.innerHTML = '<div style="padding:14px;text-align:center;color:var(--text2);font-size:12px">هیچ کاربری آنلاین نیست</div>';
         return;
       }
       list.innerHTML = users.map(u => `
-        <div class="online-item" data-uid="${u.userId}" onclick="selectPrivate('${u.userId}','${esc(u.username)}')">
+        <div class="online-item${privateTarget?.userId===u.userId?' selected':''}" data-uid="${u.userId}" onclick="selectPrivate('${u.userId}','${esc(u.username)}')">
           <span class="online-dot"></span>
           <div class="online-avatar">${u.username.charAt(0).toUpperCase()}</div>
           <div class="online-name">${esc(u.username)}${u.role==='admin' ? ' 👑' : ''}</div>
@@ -392,8 +188,7 @@
       let el = convs.querySelector(`[data-conv="${userId}"]`);
       if (!el) {
         el = document.createElement('div');
-        el.className = 'online-item';
-        el.dataset.conv = userId;
+        el.className = 'online-item'; el.dataset.conv = userId;
         el.onclick = () => selectPrivate(userId, username);
         convs.appendChild(el);
       }
@@ -410,7 +205,8 @@
     function clearMessages() {
       messagesArea.innerHTML = '';
       messagesArea.appendChild(scrollBtn);
-      document.getElementById('emptyChat').style.display = 'none';
+      const ec = document.getElementById('emptyChat');
+      if (ec) ec.style.display = 'none';
     }
 
     function appendMsg(msg, isPrivate) {
@@ -433,8 +229,7 @@
 
     function appendSys(text) {
       const div = document.createElement('div');
-      div.className = 'msg-sys';
-      div.textContent = text;
+      div.className = 'msg-sys'; div.textContent = text;
       messagesArea.insertBefore(div, scrollBtn);
       autoScroll();
     }
@@ -448,13 +243,9 @@
       const inp = document.getElementById('msgInput');
       const text = inp.value.trim();
       if (!text || !socket) return;
-      if (mode === 'public') {
-        socket.emit('chat:sendPublic', { message: text });
-      } else if (mode === 'private' && privateTarget) {
-        socket.emit('chat:sendPrivate', { toUserId: privateTarget.userId, toUsername: privateTarget.username, message: text });
-      }
-      inp.value = '';
-      inp.style.height = '';
+      if (mode === 'public') socket.emit('chat:sendPublic', { message: text });
+      else if (mode === 'private' && privateTarget) socket.emit('chat:sendPrivate', { toUserId: privateTarget.userId, toUsername: privateTarget.username, message: text });
+      inp.value = ''; inp.style.height = '';
     }
 
     function handleKey(e) {
@@ -462,12 +253,7 @@
     }
     function autoResize(el) {
       el.style.height = '';
-      el.style.height = Math.min(el.scrollHeight, 100) + 'px';
-    }
-    function scrollBottom() {
-      messagesArea.scrollTop = messagesArea.scrollHeight;
-      scrollBtn.style.display = 'none';
-      scrolledUp = false;
+      el.style.height = Math.min(el.scrollHeight, 90) + 'px';
     }
   </script>
 </body>

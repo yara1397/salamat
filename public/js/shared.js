@@ -43,7 +43,7 @@ function renderNavbar(user) {
       <span class="brand-name">نانا</span>
     </a>
     <div class="nav-links" id="navLinks">${authLinks}</div>
-    <button class="hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')">☰</button>
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">☰</button>
   </nav>
   <div class="mobile-menu" id="mobileMenu">
     <a href="/">خانه</a>
@@ -51,9 +51,10 @@ function renderNavbar(user) {
       <a href="/exercise.html">ورزش</a>
       <a href="/nutrition.html">تغذیه</a>
       <a href="/classes.html">کلاس آنلاین</a>
+      <a href="/chat.html">💬 چت</a>
       <a href="/profile.html">پروفایل</a>
       ${user.role === 'admin' ? '<a href="/admin.html">👑 پنل مدیریت</a>' : ''}
-      <button onclick="logout()" style="background:none;border:none;color:#ff6b6b;font-family:Vazirmatn,sans-serif;font-size:15px;padding:10px 14px;cursor:pointer;text-align:right;">🚪 خروج</button>
+      <button onclick="logout()" style="background:none;border:none;color:#ff6b6b;font-family:Vazirmatn,sans-serif;font-size:15px;padding:10px 14px;cursor:pointer;text-align:right;width:100%;">🚪 خروج</button>
     ` : `
       <a href="/login.html">ورود</a>
       <a href="/register.html">ثبت‌نام</a>
@@ -61,18 +62,40 @@ function renderNavbar(user) {
   </div>`;
 }
 
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburgerBtn');
+  if (menu) {
+    menu.classList.toggle('open');
+    btn.textContent = menu.classList.contains('open') ? '✕' : '☰';
+  }
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburgerBtn');
+  if (menu && menu.classList.contains('open')) {
+    if (!menu.contains(e.target) && e.target !== btn) {
+      menu.classList.remove('open');
+      if (btn) btn.textContent = '☰';
+    }
+  }
+});
+
 function renderFooter() {
   return `
   <footer class="footer">
     <div class="footer-content">
       <div class="footer-brand">
-        <img src="/logo.svg" alt="سلامت نانا" style="height:36px;width:auto;">
+        <div style="font-size:24px;font-weight:800;color:var(--green-light)">🌿 نانا</div>
         <p>سلامت بدن، آرامش روح</p>
       </div>
       <div class="footer-links">
         <a href="/exercise.html">آموزش ورزشی</a>
         <a href="/nutrition.html">تغذیه سالم</a>
         <a href="/classes.html">کلاس آنلاین</a>
+        <a href="/chat.html">💬 چت</a>
       </div>
     </div>
     <div class="footer-bottom"><p>© ۱۴۰۳ نانا — تمامی حقوق محفوظ است</p></div>
@@ -80,6 +103,8 @@ function renderFooter() {
 }
 
 function injectLayout(user) {
-  document.getElementById('navbar').innerHTML = renderNavbar(user);
-  document.getElementById('footer').innerHTML = renderFooter();
+  const nb = document.getElementById('navbar');
+  const ft = document.getElementById('footer');
+  if (nb) nb.innerHTML = renderNavbar(user);
+  if (ft) ft.innerHTML = renderFooter();
 }

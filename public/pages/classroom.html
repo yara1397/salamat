@@ -1,215 +1,214 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>کلاس زنده — نانا</title>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
   <style>
-    #navbar,#footer { display:none; }
-    body { height:100vh; overflow:hidden; background:var(--bg); }
+    #navbar, #footer { display: none; }
+    * { box-sizing: border-box; }
+    body { height: 100vh; overflow: hidden; background: var(--bg); margin: 0; }
 
-    .room-layout {
+    .room-wrap {
       display: grid;
-      grid-template-columns: 1fr 340px;
+      grid-template-columns: 1fr 320px;
       height: 100vh;
+      overflow: hidden;
     }
 
-    /* ── Left: video + controls ── */
-    .room-main {
+    /* ── Left panel ── */
+    .room-left {
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      background: var(--bg);
+      min-height: 0;
     }
 
     .room-topbar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 18px; background: var(--bg2);
+      padding: 10px 16px; background: var(--bg2);
       border-bottom: 1px solid var(--border);
-      flex-shrink: 0; gap: 10px; flex-wrap: wrap;
+      flex-shrink: 0; gap: 8px; flex-wrap: wrap;
     }
-    .room-title { display:flex; align-items:center; gap:8px; }
-    .live-dot { color:#4dff9a; font-size:11px; animation:pulse 1.5s infinite; }
+    .room-title { display: flex; align-items: center; gap: 7px; min-width: 0; }
+    .live-dot { color: #4dff9a; font-size: 10px; animation: pulse 1.5s infinite; flex-shrink: 0; }
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-    .room-name { font-size:17px; font-weight:700; }
+    .room-name { font-size: 15px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    .ctrl-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .ctrl-bar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
     .ctrl-btn {
-      background:var(--bg3); border:1px solid var(--border);
-      color:var(--text); padding:8px 14px; border-radius:8px;
-      font-family:'Vazirmatn',sans-serif; cursor:pointer; font-size:13px;
-      text-decoration:none; display:inline-flex; align-items:center;
-      gap:5px; transition:all .18s;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); padding: 7px 12px; border-radius: 8px;
+      font-family: 'Vazirmatn', sans-serif; cursor: pointer; font-size: 12px;
+      text-decoration: none; display: inline-flex; align-items: center;
+      gap: 4px; transition: all .18s; white-space: nowrap;
     }
-    .ctrl-btn:hover { border-color:var(--green); }
-    .ctrl-btn.active { background:var(--green); border-color:var(--green); color:white; }
-    .ctrl-btn.off { opacity:.45; }
-    .ctrl-btn.danger { background:rgba(220,50,50,.15); border-color:rgba(220,50,50,.3); color:#ff6b6b; }
-    .ctrl-btn.danger:hover { background:rgba(220,50,50,.3); }
+    .ctrl-btn:hover { border-color: var(--green); }
+    .ctrl-btn.active { background: var(--green); border-color: var(--green); color: white; }
+    .ctrl-btn.off { opacity: .5; }
+    .ctrl-btn.danger { background: rgba(220,50,50,.15); border-color: rgba(220,50,50,.3); color: #ff6b6b; }
+    .ctrl-btn.danger:hover { background: rgba(220,50,50,.3); }
 
-    /* ── Video Grid ── */
+    /* Video grid */
     .video-grid {
       flex: 1;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 10px;
-      padding: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px;
+      padding: 10px;
       overflow-y: auto;
       align-content: start;
+      min-height: 0;
     }
-
     .video-tile {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      position: relative;
-      aspect-ratio: 16/9;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 11px; overflow: hidden; position: relative;
+      aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center;
+    }
+    .video-tile.speaking { border-color: var(--green); box-shadow: 0 0 0 2px rgba(45,158,107,.3); }
+    .video-tile video { width: 100%; height: 100%; object-fit: cover; }
+    .tile-label {
+      position: absolute; bottom: 7px; right: 7px;
+      background: rgba(0,0,0,.65); color: white;
+      padding: 2px 9px; border-radius: 6px; font-size: 11px; font-weight: 600;
+    }
+    .tile-muted { position: absolute; top: 7px; left: 7px; font-size: 13px; }
+    .video-off-ph {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 7px; color: var(--text2); font-size: 12px;
+    }
+    .video-off-ph .av {
+      width: 50px; height: 50px; border-radius: 50%;
+      background: var(--green); color: white;
       display: flex; align-items: center; justify-content: center;
-    }
-    .video-tile.speaking { border-color: var(--green); }
-    .video-tile video {
-      width:100%; height:100%; object-fit:cover;
-    }
-    .video-tile .tile-label {
-      position:absolute; bottom:8px; right:8px;
-      background:rgba(0,0,0,.65); color:white;
-      padding:3px 10px; border-radius:6px; font-size:12px; font-weight:600;
-    }
-    .video-tile .tile-muted {
-      position:absolute; top:8px; left:8px;
-      font-size:14px;
-    }
-    .video-off-placeholder {
-      width:100%; height:100%;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      gap:8px; color:var(--text2); font-size:13px;
-    }
-    .video-off-placeholder .avatar {
-      width:56px; height:56px; border-radius:50%;
-      background:var(--green); color:white;
-      display:flex; align-items:center; justify-content:center;
-      font-size:24px; font-weight:800;
+      font-size: 22px; font-weight: 800;
     }
 
-    /* ── Participants panel (admin) ── */
+    /* Participants panel */
     .participants-section {
-      flex-shrink: 0;
-      background: var(--bg2);
+      flex-shrink: 0; background: var(--bg2);
       border-top: 1px solid var(--border);
-      padding: 10px 14px;
-      max-height: 180px;
-      overflow-y: auto;
-      display: none;
+      padding: 9px 13px; max-height: 160px; overflow-y: auto; display: none;
     }
-    .participants-section h4 { font-size:13px; margin-bottom:8px; color:var(--text2); }
-    .p-list { display:flex; flex-direction:column; gap:6px; }
+    .participants-section h4 { font-size: 12px; margin-bottom: 7px; color: var(--text2); }
+    .p-list { display: flex; flex-direction: column; gap: 5px; }
     .p-row {
-      display:flex; align-items:center; justify-content:space-between;
-      background:var(--card); border-radius:8px; padding:7px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--card); border-radius: 8px; padding: 6px 10px;
     }
-    .p-name { font-size:13px; font-weight:600; }
-    .p-btns { display:flex; gap:5px; }
+    .p-name { font-size: 12px; font-weight: 600; }
+    .p-btns { display: flex; gap: 4px; }
     .perm-btn {
-      background:var(--bg3); border:1px solid var(--border);
-      color:var(--text2); padding:4px 9px; border-radius:6px;
-      cursor:pointer; font-size:13px; transition:all .15s; opacity:.45;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text2); padding: 4px 8px; border-radius: 6px;
+      cursor: pointer; font-size: 12px; transition: all .15s; opacity: .45;
     }
-    .perm-btn.on { opacity:1; border-color:var(--green); background:rgba(45,158,107,.2); color:var(--green-light); }
+    .perm-btn.on { opacity: 1; border-color: var(--green); background: rgba(45,158,107,.2); color: var(--green-light); }
 
-    /* ── Chat ── */
+    /* ── Right: Chat ── */
     .room-chat {
       display: flex; flex-direction: column;
       background: var(--bg2);
       border-right: 1px solid var(--border);
       height: 100vh;
+      overflow: hidden;
     }
     .chat-head {
-      padding:14px 16px;
-      border-bottom:1px solid var(--border);
-      display:flex; align-items:center; justify-content:space-between;
-      flex-shrink:0;
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
     }
-    .chat-head h3 { font-size:15px; font-weight:700; }
+    .chat-head h3 { font-size: 14px; font-weight: 700; }
     .chat-msgs {
-      flex:1;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      /* important: scroll stays at bottom */
-      scroll-behavior: smooth;
+      flex: 1; overflow-y: auto; padding: 10px;
+      display: flex; flex-direction: column; gap: 7px;
+      scroll-behavior: smooth; min-height: 0;
     }
-    /* Scroll to bottom button */
     .scroll-btn {
-      position: sticky;
-      bottom: 8px;
-      align-self: center;
-      background: var(--green);
-      color: white;
-      border: none;
-      border-radius: 20px;
-      padding: 6px 16px;
-      font-family: 'Vazirmatn', sans-serif;
-      font-size: 12px;
-      cursor: pointer;
-      display: none;
-      z-index: 10;
+      position: sticky; bottom: 6px; align-self: center;
+      background: var(--green); color: white; border: none;
+      border-radius: 18px; padding: 5px 14px;
+      font-family: 'Vazirmatn', sans-serif; font-size: 11px;
+      cursor: pointer; display: none; z-index: 10;
     }
-    .msg { max-width:90%; border-radius:10px; padding:9px 13px; word-break:break-word; }
-    .msg-me { background:rgba(45,158,107,.25); border:1px solid rgba(45,158,107,.3); align-self:flex-end; }
-    .msg-other { background:var(--card); border:1px solid var(--border); align-self:flex-start; }
-    .msg-private { background:rgba(244,167,38,.1); border-color:rgba(244,167,38,.3) !important; }
-    .msg-head { display:flex; justify-content:space-between; gap:8px; margin-bottom:3px; }
-    .msg-user { font-size:11px; color:var(--green-light); font-weight:700; }
-    .msg-time { font-size:10px; color:var(--text2); }
-    .msg-text { font-size:13px; line-height:1.5; }
-    .msg-sys { text-align:center; font-size:11px; color:var(--text2); padding:2px 0; font-style:italic; }
-    .private-row {
-      padding:8px 12px;
-      border-top:1px solid var(--border);
-      display:flex; align-items:center; gap:8px;
-      font-size:12px; color:var(--text2); flex-shrink:0;
+    .msg { max-width: 88%; border-radius: 10px; padding: 8px 12px; word-break: break-word; }
+    .msg-me { background: rgba(45,158,107,.25); border: 1px solid rgba(45,158,107,.3); align-self: flex-end; }
+    .msg-other { background: var(--card); border: 1px solid var(--border); align-self: flex-start; }
+    .msg-private { background: rgba(244,167,38,.1); border-color: rgba(244,167,38,.3) !important; }
+    .msg-head { display: flex; justify-content: space-between; gap: 6px; margin-bottom: 3px; }
+    .msg-user { font-size: 11px; color: var(--green-light); font-weight: 700; }
+    .msg-time { font-size: 10px; color: var(--text2); }
+    .msg-text { font-size: 13px; line-height: 1.5; }
+    .msg-sys { text-align: center; font-size: 11px; color: var(--text2); padding: 2px 0; font-style: italic; }
+    .priv-row {
+      padding: 7px 11px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text2); flex-shrink: 0;
     }
-    .private-row select {
-      background:var(--bg3); border:1px solid var(--border);
-      color:var(--text); border-radius:7px; padding:5px 10px;
-      font-family:'Vazirmatn',sans-serif; font-size:12px; flex:1; outline:none;
+    .priv-row select {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); border-radius: 7px; padding: 5px 9px;
+      font-family: 'Vazirmatn', sans-serif; font-size: 11px; flex: 1; outline: none;
     }
-    .chat-inp-row {
-      padding:10px 12px;
-      border-top:1px solid var(--border);
-      display:flex; gap:8px; flex-shrink:0;
-    }
+    .chat-inp-row { padding: 9px 11px; border-top: 1px solid var(--border); display: flex; gap: 7px; flex-shrink: 0; }
     .chat-inp {
-      flex:1; background:var(--bg3); border:1px solid var(--border);
-      color:var(--text); border-radius:9px; padding:9px 13px;
-      font-family:'Vazirmatn',sans-serif; font-size:13px; outline:none;
+      flex: 1; background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); border-radius: 9px; padding: 8px 12px;
+      font-family: 'Vazirmatn', sans-serif; font-size: 13px; outline: none;
     }
-    .chat-inp:focus { border-color:var(--green); }
+    .chat-inp:focus { border-color: var(--green); }
     .send-btn {
-      background:var(--green); color:white; border:none;
-      border-radius:9px; padding:9px 16px;
-      font-family:'Vazirmatn',sans-serif; font-weight:600; font-size:13px;
-      cursor:pointer; transition:background .2s; white-space:nowrap;
+      background: var(--green); color: white; border: none;
+      border-radius: 9px; padding: 8px 14px;
+      font-family: 'Vazirmatn', sans-serif; font-weight: 600; font-size: 13px;
+      cursor: pointer; white-space: nowrap;
     }
-    .send-btn:hover { background:var(--green-light); }
+    .send-btn:hover { background: var(--green-light); }
 
-    @media(max-width:850px){
-      .room-layout { grid-template-columns:1fr; grid-template-rows:1fr 380px; }
-      body { overflow-y:auto; }
-      .room-chat { height:380px; }
+    /* Mobile toggle chat button */
+    .toggle-chat-btn {
+      display: none;
+      background: var(--green); color: white; border: none;
+      border-radius: 50%; width: 46px; height: 46px;
+      font-size: 20px; cursor: pointer;
+      position: fixed; bottom: 20px; left: 20px; z-index: 300;
+      box-shadow: 0 4px 16px rgba(0,0,0,.4);
+      align-items: center; justify-content: center;
+    }
+
+    @media (max-width: 850px) {
+      body { overflow-y: auto; height: auto; }
+      .room-wrap {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        height: auto;
+        min-height: 100vh;
+      }
+      .room-left { height: auto; min-height: 60vh; }
+      .room-chat {
+        height: 400px;
+        border-right: none;
+        border-top: 1px solid var(--border);
+        position: relative;
+      }
+      .toggle-chat-btn { display: flex; }
+    }
+    @media (max-width: 480px) {
+      .ctrl-btn { padding: 6px 9px; font-size: 11px; }
+      .room-topbar { padding: 8px 11px; }
+      .room-chat { height: 360px; }
     }
   </style>
 </head>
 <body>
 <div id="navbar"></div>
 
-<div class="room-layout">
-  <!-- ── LEFT: Video + Controls ── -->
-  <div class="room-main">
+<button class="toggle-chat-btn" id="toggleChatBtn" onclick="toggleChat()" title="چت">💬</button>
+
+<div class="room-wrap" id="roomWrap">
+  <!-- ── Left ── -->
+  <div class="room-left">
     <div class="room-topbar">
       <div class="room-title">
         <span class="live-dot">●</span>
@@ -219,37 +218,33 @@
         <button id="btnMic" class="ctrl-btn off" onclick="toggleMic()">🎙️ میکروفون</button>
         <button id="btnCam" class="ctrl-btn off" onclick="toggleCam()">📷 دوربین</button>
         <a href="/classes.html" class="ctrl-btn danger">🚪 خروج</a>
-        <button id="btnEnd" class="ctrl-btn danger" style="display:none" onclick="endClass()">⛔ پایان کلاس</button>
+        <button id="btnEnd" class="ctrl-btn danger" style="display:none" onclick="endClass()">⛔ پایان</button>
       </div>
     </div>
 
-    <!-- Video Grid: shows all participants with camera on -->
-    <div class="video-grid" id="videoGrid">
-      <!-- tiles added dynamically -->
-    </div>
+    <div class="video-grid" id="videoGrid"></div>
 
-    <!-- Admin: Participants control -->
     <div class="participants-section" id="participantsSection">
-      <h4>👥 مدیریت دسترسی شرکت‌کنندگان</h4>
+      <h4>👥 مدیریت دسترسی</h4>
       <div class="p-list" id="pList"></div>
     </div>
   </div>
 
-  <!-- ── RIGHT: Chat ── -->
-  <div class="room-chat">
+  <!-- ── Right: Chat ── -->
+  <div class="room-chat" id="roomChat">
     <div class="chat-head">
-      <h3>💬 چت عمومی</h3>
-      <button id="btnClear" class="ctrl-btn danger" style="display:none;padding:5px 10px" onclick="clearChat()" title="پاک کردن چت">🗑️</button>
+      <h3>💬 چت کلاس</h3>
+      <button id="btnClear" class="ctrl-btn danger" style="display:none;padding:4px 9px" onclick="clearChat()">🗑️ پاک</button>
     </div>
     <div class="chat-msgs" id="chatMsgs">
       <button class="scroll-btn" id="scrollBtn" onclick="scrollToBottom()">↓ پیام جدید</button>
     </div>
-    <div class="private-row">
-      <span>پیام به:</span>
+    <div class="priv-row">
+      <span>به:</span>
       <select id="privTarget"><option value="">— همه —</option></select>
     </div>
     <div class="chat-inp-row">
-      <input class="chat-inp" id="chatInp" placeholder="پیام بنویسید..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <input class="chat-inp" id="chatInp" placeholder="پیام..." onkeydown="if(event.key==='Enter')sendMsg()">
       <button class="send-btn" onclick="sendMsg()">ارسال</button>
     </div>
   </div>
@@ -262,26 +257,26 @@
 const classId = new URLSearchParams(location.search).get('id');
 if (!classId) location.href = '/classes.html';
 
-let me = null;
-let socket = null;
+let me = null, socket = null;
 let myPerms = { video: false, audio: false, chat: true };
 let localStream = null;
-// peerConnections: { socketId: RTCPeerConnection }
 let peers = {};
-// socketId → { userId, username }
 let peerInfo = {};
 let mySocketId = null;
-const ICE = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+const ICE = { iceServers: [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' }
+]};
 
-// ── Chat scroll management ──
+// Chat scroll
 const chatMsgs = document.getElementById('chatMsgs');
 const scrollBtn = document.getElementById('scrollBtn');
 let userScrolledUp = false;
 
 chatMsgs.addEventListener('scroll', () => {
-  const atBottom = chatMsgs.scrollHeight - chatMsgs.scrollTop - chatMsgs.clientHeight < 60;
-  if (atBottom) { userScrolledUp = false; scrollBtn.style.display = 'none'; }
-  else userScrolledUp = true;
+  const atBottom = chatMsgs.scrollHeight - chatMsgs.scrollTop - chatMsgs.clientHeight < 80;
+  userScrolledUp = !atBottom;
+  scrollBtn.style.display = (!atBottom) ? 'inline-block' : 'none';
 });
 
 function scrollToBottom() {
@@ -290,20 +285,28 @@ function scrollToBottom() {
   userScrolledUp = false;
 }
 function autoScroll() {
-  if (!userScrolledUp) {
-    chatMsgs.scrollTop = chatMsgs.scrollHeight;
-  } else {
-    scrollBtn.style.display = 'inline-block';
-  }
+  if (!userScrolledUp) chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  else scrollBtn.style.display = 'inline-block';
 }
 
-// ── Init ──
+// Mobile chat toggle
+let chatVisible = true;
+function toggleChat() {
+  const chat = document.getElementById('roomChat');
+  const btn = document.getElementById('toggleChatBtn');
+  chatVisible = !chatVisible;
+  chat.style.display = chatVisible ? '' : 'none';
+  btn.textContent = chatVisible ? '✕' : '💬';
+  btn.style.background = chatVisible ? '#1e7a50' : 'var(--green)';
+}
+
+// Init
 (async () => {
   me = await requireLogin();
   if (!me) return;
 
   const cls = await fetch('/api/classes/' + classId).then(r => r.json());
-  if (!cls || !cls.isLive) { alert('این کلاس در دسترس نیست'); location.href = '/classes.html'; return; }
+  if (!cls || !cls.is_live) { alert('این کلاس در دسترس نیست'); location.href = '/classes.html'; return; }
   document.getElementById('roomName').textContent = cls.title;
   document.title = cls.title + ' — نانا';
 
@@ -313,28 +316,20 @@ function autoScroll() {
     document.getElementById('participantsSection').style.display = 'block';
   }
 
-  // My own video tile (placeholder until cam enabled)
   addVideoTile('local', me.username, null);
 
-  socket = io();
-  mySocketId = null;
-
+  socket = io({ transports: ['websocket', 'polling'] });
   socket.on('connect', () => { mySocketId = socket.id; });
 
   socket.on('permissions', p => {
     myPerms = p;
     document.getElementById('btnMic').classList.toggle('off', !p.audio);
+    document.getElementById('btnMic').classList.toggle('active', p.audio && localStream?.getAudioTracks()[0]?.enabled);
     document.getElementById('btnCam').classList.toggle('off', !p.video);
     document.getElementById('chatInp').disabled = !p.chat;
-    document.getElementById('chatInp').placeholder = p.chat ? 'پیام بنویسید...' : 'دسترسی چت ندارید';
-    // If we lost video permission, stop tracks
-    if (!p.video && localStream) {
-      localStream.getVideoTracks().forEach(t => { t.enabled = false; });
-      updateLocalTile(false);
-    }
-    if (!p.audio && localStream) {
-      localStream.getAudioTracks().forEach(t => { t.enabled = false; });
-    }
+    document.getElementById('chatInp').placeholder = p.chat ? 'پیام...' : 'دسترسی چت ندارید';
+    if (!p.video && localStream) { localStream.getVideoTracks().forEach(t => { t.enabled = false; }); updateLocalTile(false); }
+    if (!p.audio && localStream) { localStream.getAudioTracks().forEach(t => { t.enabled = false; }); }
   });
 
   socket.on('chatHistory', msgs => {
@@ -345,32 +340,20 @@ function autoScroll() {
   });
 
   socket.on('newMessage', msg => { appendMsg(msg); autoScroll(); });
-  socket.on('chatCleared', () => {
-    chatMsgs.innerHTML = '';
-    chatMsgs.appendChild(scrollBtn);
-    appendSys('چت توسط مدیر پاک شد');
-  });
-
-  socket.on('userJoined', ({ userId, username }) => {
-    appendSys(username + ' وارد کلاس شد');
-  });
-
-  socket.on('userLeft', ({ userId, username }) => {
-    appendSys(username + ' کلاس را ترک کرد');
-    // Remove their video tile and peer connection
-    removePeer(userId);
-  });
+  socket.on('chatCleared', () => { chatMsgs.innerHTML = ''; chatMsgs.appendChild(scrollBtn); appendSys('چت پاک شد'); });
+  socket.on('userJoined', ({ username }) => appendSys(username + ' وارد شد'));
+  socket.on('userLeft', ({ userId, username }) => { appendSys(username + ' خارج شد'); removePeer(userId); });
 
   socket.on('participantsList', participants => {
     updateParticipants(participants);
-    // Update private message dropdown
     const sel = document.getElementById('privTarget');
     const cur = sel.value;
     sel.innerHTML = '<option value="">— همه —</option>';
     participants.forEach(p => {
       if (p.userId !== me.id) {
         const o = document.createElement('option');
-        o.value = p.userId; o.textContent = p.username + (p.role === 'admin' ? ' 👑' : '');
+        o.value = p.userId;
+        o.textContent = p.username + (p.role === 'admin' ? ' 👑' : '');
         sel.appendChild(o);
       }
     });
@@ -378,14 +361,13 @@ function autoScroll() {
   });
 
   socket.on('permissionUpdate', ({ userId, perm, value }) => {
-    // Update participants panel button
     const btn = document.querySelector(`[data-uid="${userId}"][data-perm="${perm}"]`);
     if (btn) btn.classList.toggle('on', value);
   });
 
   socket.on('classEnded', () => { alert('کلاس توسط مدیر پایان یافت'); location.href = '/classes.html'; });
 
-  // ── WebRTC signaling ──
+  // WebRTC
   socket.on('rtc-offer', async ({ from, fromUser, offer }) => {
     const pc = createPeer(from, fromUser);
     await pc.setRemoteDescription(new RTCSessionDescription(offer));
@@ -393,18 +375,14 @@ function autoScroll() {
     await pc.setLocalDescription(answer);
     socket.emit('rtc-answer', { to: from, answer });
   });
-
   socket.on('rtc-answer', async ({ from, answer }) => {
     const pc = peers[from];
     if (pc) await pc.setRemoteDescription(new RTCSessionDescription(answer));
   });
-
   socket.on('rtc-ice', async ({ from, candidate }) => {
     const pc = peers[from];
     if (pc && candidate) try { await pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e) {}
   });
-
-  // When a new user joins and we already have stream, call them
   socket.on('userJoinedWithId', async ({ socketId, userId, username }) => {
     if (socketId === mySocketId) return;
     peerInfo[socketId] = { userId, username };
@@ -414,7 +392,7 @@ function autoScroll() {
   socket.emit('joinClass', classId);
 })();
 
-// ── Video Tiles ──
+// Video tiles
 function addVideoTile(id, username, stream) {
   let tile = document.getElementById('tile-' + id);
   if (!tile) {
@@ -423,29 +401,29 @@ function addVideoTile(id, username, stream) {
     tile.id = 'tile-' + id;
     document.getElementById('videoGrid').appendChild(tile);
   }
-  if (stream && stream.getVideoTracks().length > 0 && stream.getVideoTracks()[0].enabled) {
+  const hasVideo = stream && stream.getVideoTracks().length > 0 && stream.getVideoTracks()[0].enabled;
+  if (hasVideo) {
     tile.innerHTML = `<video id="vid-${id}" autoplay ${id==='local'?'muted':''} playsinline></video>
       <div class="tile-label">${username}${id==='local'?' (شما)':''}</div>
       <div class="tile-muted" id="mic-${id}" style="display:none">🔇</div>`;
     document.getElementById('vid-' + id).srcObject = stream;
   } else {
-    tile.innerHTML = `<div class="video-off-placeholder">
-      <div class="avatar">${username.charAt(0).toUpperCase()}</div>
+    tile.innerHTML = `<div class="video-off-ph">
+      <div class="av">${username.charAt(0).toUpperCase()}</div>
       <span>${username}${id==='local'?' (شما)':''}</span>
-    </div>
-    <div class="tile-muted" id="mic-${id}" style="display:none">🔇</div>`;
+    </div><div class="tile-muted" id="mic-${id}" style="display:none">🔇</div>`;
   }
 }
 
 function updateLocalTile(videoOn) {
   addVideoTile('local', me.username, videoOn ? localStream : null);
   if (videoOn && localStream) {
-    document.getElementById('vid-local').srcObject = localStream;
+    const v = document.getElementById('vid-local');
+    if (v) v.srcObject = localStream;
   }
 }
 
 function removePeer(userId) {
-  // Find socketId for this userId
   for (const [sid, info] of Object.entries(peerInfo)) {
     if (info.userId === userId) {
       if (peers[sid]) { peers[sid].close(); delete peers[sid]; }
@@ -457,37 +435,25 @@ function removePeer(userId) {
   }
 }
 
-// ── WebRTC Peer ──
+// WebRTC
 function createPeer(socketId, username) {
-  if (peers[socketId]) { peers[socketId].close(); }
+  if (peers[socketId]) peers[socketId].close();
   const pc = new RTCPeerConnection(ICE);
   peers[socketId] = pc;
-
-  // Add local tracks if we have stream
-  if (localStream) {
-    localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
-  }
-
-  pc.onicecandidate = e => {
-    if (e.candidate) socket.emit('rtc-ice', { to: socketId, candidate: e.candidate });
-  };
-
+  if (localStream) localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+  pc.onicecandidate = e => { if (e.candidate) socket.emit('rtc-ice', { to: socketId, candidate: e.candidate }); };
   pc.ontrack = e => {
     const info = peerInfo[socketId];
     const uid = info?.userId || socketId;
     const uname = info?.username || 'کاربر';
     addVideoTile(uid, uname, e.streams[0]);
-    // Update if video track toggles
-    e.streams[0].onaddtrack = () => addVideoTile(uid, uname, e.streams[0]);
   };
-
   pc.onconnectionstatechange = () => {
-    if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+    if (['failed','disconnected','closed'].includes(pc.connectionState)) {
       const info = peerInfo[socketId];
       if (info) removePeer(info.userId);
     }
   };
-
   return pc;
 }
 
@@ -498,9 +464,9 @@ async function callPeer(socketId, username) {
   socket.emit('rtc-offer', { to: socketId, fromUser: me.username, offer });
 }
 
-// ── Media Controls ──
+// Media
 async function toggleMic() {
-  if (!myPerms.audio) { alert('مدیر دسترسی میکروفون را به شما نداده'); return; }
+  if (!myPerms.audio) { alert('مدیر دسترسی میکروفون را نداده'); return; }
   if (!localStream) { await startStream(); return; }
   const track = localStream.getAudioTracks()[0];
   if (track) {
@@ -511,7 +477,7 @@ async function toggleMic() {
 }
 
 async function toggleCam() {
-  if (!myPerms.video) { alert('مدیر دسترسی دوربین را به شما نداده'); return; }
+  if (!myPerms.video) { alert('مدیر دسترسی دوربین را نداده'); return; }
   if (!localStream) { await startStream(); return; }
   const track = localStream.getVideoTracks()[0];
   if (track) {
@@ -519,38 +485,24 @@ async function toggleCam() {
     document.getElementById('btnCam').classList.toggle('active', track.enabled);
     document.getElementById('btnCam').classList.toggle('off', !track.enabled);
     updateLocalTile(track.enabled);
-    // Notify peers of video change via renegotiation
     renegotiateAll();
   }
 }
 
 async function startStream() {
   try {
-    localStream = await navigator.mediaDevices.getUserMedia({
-      video: myPerms.video,
-      audio: myPerms.audio
-    });
+    localStream = await navigator.mediaDevices.getUserMedia({ video: myPerms.video, audio: myPerms.audio });
     updateLocalTile(myPerms.video);
-    document.getElementById('btnMic').classList.toggle('active', myPerms.audio);
-    document.getElementById('btnMic').classList.toggle('off', !myPerms.audio);
-    document.getElementById('btnCam').classList.toggle('active', myPerms.video);
-    document.getElementById('btnCam').classList.toggle('off', !myPerms.video);
-
-    // Add tracks to existing peers
+    if (myPerms.audio) { document.getElementById('btnMic').classList.add('active'); document.getElementById('btnMic').classList.remove('off'); }
+    if (myPerms.video) { document.getElementById('btnCam').classList.add('active'); document.getElementById('btnCam').classList.remove('off'); }
     for (const [sid, pc] of Object.entries(peers)) {
       localStream.getTracks().forEach(t => {
         const sender = pc.getSenders().find(s => s.track?.kind === t.kind);
-        if (sender) sender.replaceTrack(t);
-        else pc.addTrack(t, localStream);
+        if (sender) sender.replaceTrack(t); else pc.addTrack(t, localStream);
       });
     }
-    // Call all existing peers
-    for (const [sid, info] of Object.entries(peerInfo)) {
-      await callPeer(sid, info.username);
-    }
-  } catch(e) {
-    alert('خطا در دسترسی به دوربین/میکروفون: ' + e.message);
-  }
+    for (const [sid, info] of Object.entries(peerInfo)) await callPeer(sid, info.username);
+  } catch(e) { alert('خطا: ' + e.message); }
 }
 
 async function renegotiateAll() {
@@ -563,18 +515,18 @@ async function renegotiateAll() {
   }
 }
 
-// ── Admin controls ──
+// Admin
 function updateParticipants(list) {
   const el = document.getElementById('pList');
   if (!el) return;
-  if (list.length === 0) { el.innerHTML = '<p style="color:var(--text2);font-size:12px">هنوز کسی در کلاس نیست</p>'; return; }
+  if (list.length === 0) { el.innerHTML = '<p style="color:var(--text2);font-size:12px;padding:6px">هنوز کسی نیست</p>'; return; }
   el.innerHTML = list.map(p => `
     <div class="p-row">
       <span class="p-name">${p.username}${p.role==='admin'?' 👑':''}</span>
       <div class="p-btns">
-        <button class="perm-btn ${p.perms?.video?'on':''}" data-uid="${p.userId}" data-perm="video" title="دوربین" onclick="setPerm('${p.userId}','video',this)">📷</button>
-        <button class="perm-btn ${p.perms?.audio?'on':''}" data-uid="${p.userId}" data-perm="audio" title="میکروفون" onclick="setPerm('${p.userId}','audio',this)">🎙️</button>
-        <button class="perm-btn ${p.perms?.chat!==false?'on':''}" data-uid="${p.userId}" data-perm="chat" title="چت" onclick="setPerm('${p.userId}','chat',this)">💬</button>
+        <button class="perm-btn ${p.perms?.video?'on':''}" data-uid="${p.userId}" data-perm="video" onclick="setPerm('${p.userId}','video',this)">📷</button>
+        <button class="perm-btn ${p.perms?.audio?'on':''}" data-uid="${p.userId}" data-perm="audio" onclick="setPerm('${p.userId}','audio',this)">🎙️</button>
+        <button class="perm-btn ${p.perms?.chat!==false?'on':''}" data-uid="${p.userId}" data-perm="chat" onclick="setPerm('${p.userId}','chat',this)">💬</button>
       </div>
     </div>`).join('');
 }
@@ -585,12 +537,12 @@ function setPerm(uid, perm, btn) {
   socket.emit('setPermission', { classId, targetUserId: uid, perm, value: val });
 }
 
-// ── Chat ──
+// Chat
 function appendMsg(msg) {
   const isMe = msg.userId === me?.id;
   const div = document.createElement('div');
   div.className = `msg ${isMe?'msg-me':'msg-other'} ${msg.type==='private'?'msg-private':''}`;
-  const time = new Date(msg.time).toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
+  const time = new Date(msg.time).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
   const label = msg.type === 'private'
     ? `🔒 ${msg.username}${msg.toUsername?' → '+msg.toUsername:''}`
     : msg.username;
@@ -606,9 +558,7 @@ function appendSys(text) {
   autoScroll();
 }
 
-function esc(t) {
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function sendMsg() {
   if (!myPerms.chat) { alert('دسترسی چت ندارید'); return; }
@@ -622,7 +572,7 @@ function sendMsg() {
 }
 
 function clearChat() {
-  if (confirm('تمام پیام‌های چت پاک شوند؟')) socket.emit('clearChat', { classId });
+  if (confirm('همه پیام‌ها پاک شوند؟')) socket.emit('clearChat', { classId });
 }
 
 async function endClass() {
